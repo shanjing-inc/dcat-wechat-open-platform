@@ -23,13 +23,13 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
         [
             'parent' => '微信开放平台',
             'title'  => '开放平台',
-            'uri'    => 'dcat-wechat-open-platform',
+            'uri'    => '/dcat-extension/wechat/open-platform',
             'icon'   => '', // 图标可以留空
         ],
         [
             'parent' => '微信开放平台',
             'title'  => '授权管理',
-            'uri'    => 'dcat-wechat-open-platform-authorizer',
+            'uri'    => '/dcat-extension/wechat/open-platform-authorizer',
             'icon'   => '', // 图标可以留空
         ],
     ];
