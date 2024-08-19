@@ -21,3 +21,7 @@ Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+.idea/
+.DS_Store
+.php-cs-fixer.cache
+tmp-phpqa
