@@ -11,6 +11,7 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
     protected $js = [
         'js/index.js',
     ];
+
     protected $css = [
         'css/index.css',
     ];
