@@ -8,12 +8,12 @@ use Shanjing\DcatWechatOpenPlatform\Http\Controllers\BaseAdminController;
 
 class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
 {
-	protected $js = [
+    protected $js = [
         'js/index.js',
     ];
-	protected $css = [
-		'css/index.css',
-	];
+    protected $css = [
+        'css/index.css',
+    ];
 
     protected $menu = [
         [
@@ -35,20 +35,20 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
         ],
     ];
 
-	public function register()
-	{
-		//
-	}
+    public function register()
+    {
+        //
+    }
 
-	public function init()
-	{
-	    $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', BaseAdminController::TRANSLATION_NAMESPACE);
+    public function init()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', BaseAdminController::TRANSLATION_NAMESPACE);
 
-		parent::init();
-	}
+        parent::init();
+    }
 
-	public function settingForm()
-	{
-		return new Setting($this);
-	}
+    public function settingForm()
+    {
+        return new Setting($this);
+    }
 }

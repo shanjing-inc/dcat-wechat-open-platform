@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WechatOpenPlatform extends Model
 {
-	use HasDateTimeFormatter;
+    use HasDateTimeFormatter;
     protected $table = 'wechat_open_platform';
 
     protected $guarded = [];
@@ -28,8 +28,8 @@ class WechatOpenPlatform extends Model
                 'secret'  => $config->secret,
                 'token'   => $config->token,
                 'aes_key' => $config->aes_key,
-                'http' => [
-                    'throw'  => true, // 状态码非 200、300 时是否抛出异常，默认为开启
+                'http'    => [
+                    'throw'   => true, // 状态码非 200、300 时是否抛出异常，默认为开启
                     'timeout' => 5.0,
                     // 'base_uri' => 'https://qyapi.weixin.qq.com/', // 如果你在国外想要覆盖默认的 url 的时候才使用，根据不同的模块配置不同的 uri
                     'retry' => true, // 使用默认重试配置
@@ -61,33 +61,33 @@ class WechatOpenPlatform extends Model
      */
     public function updateOrCreateAuthorizer($appid)
     {
-        $app = $this->getInstance();
-        $api = $app->getClient();
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
         $response = $api->post('/cgi-bin/component/api_get_authorizer_info', [
             'json' => [
-                "component_appid" => $this->appid,
+                "component_appid"  => $this->appid,
                 "authorizer_appid" => "wx72d4f7ef5710dc39"
             ]
         ]);
-        $result = $response->getContent();
-        $result = json_decode($result, true);
+        $result            = $response->getContent();
+        $result            = json_decode($result, true);
         $authorizerInfo    = $result['authorizer_info'];
         $authorizationInfo = $result['authorization_info'];
-        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
+        $authorizer        = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
             ['platform_id' => $this->id, 'appid' => $appid],
             [
-                'username' => $authorizerInfo['user_name'],
-                'nickname' => $authorizerInfo['nick_name'],
-                'head_img' => $authorizerInfo['head_img'],
-                'account_type' => isset($authorizerInfo['MiniProgramInfo']) ? WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP : WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_OA,
-                'service_type' => $authorizerInfo['service_type_info']['id'] ?? 0,
-                'verify_type'=> $authorizerInfo['verify_type_info']['id'] ?? 0,
-                'account_status'=> $authorizerInfo['account_status'] ?? 0,
-                'qrcode_url'=> $authorizerInfo['qrcode_url'],
-                'principal_name'=> $authorizerInfo['principal_name'],
-                'refresh_token'=> $authorizationInfo['authorizer_refresh_token'],
-                'func_info'=> $authorizationInfo['func_info'],
-                'raw_data'=> $result,
+                'username'       => $authorizerInfo['user_name'],
+                'nickname'       => $authorizerInfo['nick_name'],
+                'head_img'       => $authorizerInfo['head_img'],
+                'account_type'   => isset($authorizerInfo['MiniProgramInfo']) ? WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP : WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_OA,
+                'service_type'   => $authorizerInfo['service_type_info']['id'] ?? 0,
+                'verify_type'    => $authorizerInfo['verify_type_info']['id'] ?? 0,
+                'account_status' => $authorizerInfo['account_status'] ?? 0,
+                'qrcode_url'     => $authorizerInfo['qrcode_url'],
+                'principal_name' => $authorizerInfo['principal_name'],
+                'refresh_token'  => $authorizationInfo['authorizer_refresh_token'],
+                'func_info'      => $authorizationInfo['func_info'],
+                'raw_data'       => $result,
             ]
         );
 

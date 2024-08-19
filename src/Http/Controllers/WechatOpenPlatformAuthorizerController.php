@@ -143,15 +143,15 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
         }
 
         $server = $platform->getInstance()->getServer();
-        $server->handleAuthorized(function($message, \Closure $next) use ($platform) {
+        $server->handleAuthorized(function ($message, \Closure $next) use ($platform) {
             $platform->updateOrCreateAuthorizer($message->AuthorizerAppid);
             return $next($message);
         });
-        $server->handleAuthorizeUpdated(function($message, \Closure $next) use ($platform)  {
+        $server->handleAuthorizeUpdated(function ($message, \Closure $next) use ($platform) {
             $platform->updateOrCreateAuthorizer($message->AuthorizerAppid);
             return $next($message);
         });
-        $server->handleUnauthorized(function($message, \Closure $next) use ($platform)  {
+        $server->handleUnauthorized(function ($message, \Closure $next) use ($platform) {
             $platform->cancelAuthorizer($message->AuthorizerAppid);
             return $next($message);
         });
@@ -183,19 +183,13 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             return '开放平台不存在';
         }
 
-        $code = $request->get('auth_code');
-        $app  = $platform->getInstance();
-        $info = $app->getAuthorization($code);
+        $code  = $request->get('auth_code');
+        $app   = $platform->getInstance();
+        $info  = $app->getAuthorization($code);
         $error = Arr::get($info, 'errmsg');
 
         if (!empty($error)) {
-            $params = [
-                'title' => '授权失败',
-                'error' => '授权失败',
-                'errorDesc' => "错误详情：{$error}",
-            ];
-
-            return view('error', $params);
+            return "授权失败，错误详情：{$error}";
         }
 
         return '授权成功';
