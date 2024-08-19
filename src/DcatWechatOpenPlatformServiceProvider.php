@@ -4,15 +4,16 @@ namespace Shanjing\DcatWechatOpenPlatform;
 
 use Dcat\Admin\Extend\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Shanjing\DcatWechatOpenPlatform\Http\Controllers\BaseAdminController;
 
 class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
 {
-    protected $js = [
+	protected $js = [
         'js/index.js',
     ];
-    protected $css = [
-        'css/index.css',
-    ];
+	protected $css = [
+		'css/index.css',
+	];
 
     protected $menu = [
         [
@@ -23,32 +24,31 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
         [
             'parent' => '微信开放平台',
             'title'  => '开放平台',
-            'uri'    => '/dcat-extension/wechat/open-platform',
+            'uri'    => '/wechat/open-platform/list',
             'icon'   => '', // 图标可以留空
         ],
         [
             'parent' => '微信开放平台',
             'title'  => '授权管理',
-            'uri'    => '/dcat-extension/wechat/open-platform-authorizer',
+            'uri'    => '/wechat/open-platform/authorizer',
             'icon'   => '', // 图标可以留空
         ],
     ];
 
-    public function register()
-    {
-        //
-    }
+	public function register()
+	{
+		//
+	}
 
-    public function init()
-    {
-        $path = $this->path('src/Http/web.php');
-        Route::prefix('')->group($path);
+	public function init()
+	{
+	    $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', BaseAdminController::TRANSLATION_NAMESPACE);
 
-        parent::init();
-    }
+		parent::init();
+	}
 
-    public function settingForm()
-    {
-        return new Setting($this);
-    }
+	public function settingForm()
+	{
+		return new Setting($this);
+	}
 }

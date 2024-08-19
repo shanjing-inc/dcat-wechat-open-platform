@@ -48,9 +48,9 @@ JS;
         if ($id) {
             $platform = WechatOpenPlatform::find($id);
             $app      = $platform->getInstance();
-            $callback = url('/dacat-wechat-open-platform/authorizer');
+            $callback = route('wechat.open-platform.auth-callback', ['platformId' => $platform->id]);
             $url      = $app->createPreAuthorizationUrl($callback);
-            $url      = url('/dacat-wechat-open-platform/redirect?url=' . urlencode($url));
+            $url      = route('wechat.open-platform.auth-redirect') . '?url=' . urlencode($url);
             $button   = <<<HTML
                                 <a class="text-primary grid-column-copyable"
                                     href="javascript:void(0);"

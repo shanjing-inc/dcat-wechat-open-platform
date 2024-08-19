@@ -2,15 +2,13 @@
 
 namespace Shanjing\DcatWechatOpenPlatform\Http\Controllers;
 
-use Dcat\Admin\Actions\Action;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
-use Dcat\Admin\Http\Controllers\AdminController;
 use Dcat\Admin\Show;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerAction;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 
-class WechatOpenPlatformController extends AdminController
+class WechatOpenPlatformController extends BaseAdminController
 {
     /**
      * Make a grid builder.

@@ -5,19 +5,20 @@ namespace Shanjing\DcatWechatOpenPlatform\Http\Controllers;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
-use Dcat\Admin\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
-class WechatOpenPlatformAuthorizerController extends AdminController
+class WechatOpenPlatformAuthorizerController extends BaseAdminController
 {
     public static $accountStatusLabels = [
-        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_1  => 'success',
-        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_14 => 'default',
-        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_16 => 'danger',
-        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_18 => 'warning',
-        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_19 => 'danger',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_N_1 => 'danger',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_1   => 'success',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_14  => 'default',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_16  => 'danger',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_18  => 'warning',
+        WechatOpenPlatformAuthorizer::ACCOUNT_STATUS_19  => 'danger',
 
     ];
     /**
@@ -56,6 +57,8 @@ class WechatOpenPlatformAuthorizerController extends AdminController
                 $filter->equal('appid')->width(2);
 
             });
+
+            $grid->disableCreateButton();
         });
     }
 
@@ -103,15 +106,19 @@ class WechatOpenPlatformAuthorizerController extends AdminController
             $form->text('username');
             $form->text('nickname');
             $form->text('head_img');
-            $form->text('account_type');
-            $form->text('service_type');
-            $form->text('verify_type');
+            $form->select('account_type')->options(WechatOpenPlatformAuthorizer::$accountTypes);
+            $form->select('service_type')->options(WechatOpenPlatformAuthorizer::$oaServiceTypes);
+            $form->select('verify_type')->options(WechatOpenPlatformAuthorizer::$verifyTypes);
             $form->text('qrcode_url');
             $form->text('principal_name');
             $form->text('refresh_token');
-            $form->text('func_info');
-            $form->text('account_status');
-            $form->text('raw_data');
+            $form->textarea('func_info')->customFormat(function ($value) {
+                return json_encode($value);
+            })->disable();
+            $form->text('account_status')->options(WechatOpenPlatformAuthorizer::$accountStatuses);
+            $form->textarea('raw_data')->customFormat(function ($value) {
+                return json_encode($value);
+            })->disable();
 
             $form->display('created_at');
             $form->display('updated_at');
@@ -121,12 +128,8 @@ class WechatOpenPlatformAuthorizerController extends AdminController
     /**
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function authorizer(Request $request, $appid = '')
+    public function authorizer(Request $request)
     {
-        if (!$request->isMethod('POST')) {
-            return '授权成功';
-        }
-
         $xml = $request->getContent();
         $xml = simplexml_load_string($xml);
         if (empty($xml)) {
@@ -140,12 +143,16 @@ class WechatOpenPlatformAuthorizerController extends AdminController
         }
 
         $server = $platform->getInstance()->getServer();
-        $server->handleAuthorized(function ($message, \Closure $next) use ($platform) {
+        $server->handleAuthorized(function($message, \Closure $next) use ($platform) {
             $platform->updateOrCreateAuthorizer($message->AuthorizerAppid);
             return $next($message);
         });
-        $server->handleAuthorizeUpdated(function ($message, \Closure $next) use ($platform) {
+        $server->handleAuthorizeUpdated(function($message, \Closure $next) use ($platform)  {
             $platform->updateOrCreateAuthorizer($message->AuthorizerAppid);
+            return $next($message);
+        });
+        $server->handleUnauthorized(function($message, \Closure $next) use ($platform)  {
+            $platform->cancelAuthorizer($message->AuthorizerAppid);
             return $next($message);
         });
 
@@ -160,5 +167,37 @@ class WechatOpenPlatformAuthorizerController extends AdminController
         $url = request('url', '');
         $url = urldecode($url);
         return "<a href='$url' target='_blank'>点击授权</a>";
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function callback(Request $request, $platformId)
+    {
+        if (empty($platformId) || !$request->get('auth_code')) {
+            return '参数错误';
+        }
+
+        $platform = WechatOpenPlatform::find($platformId);
+        if (empty($platform)) {
+            return '开放平台不存在';
+        }
+
+        $code = $request->get('auth_code');
+        $app  = $platform->getInstance();
+        $info = $app->getAuthorization($code);
+        $error = Arr::get($info, 'errmsg');
+
+        if (!empty($error)) {
+            $params = [
+                'title' => '授权失败',
+                'error' => '授权失败',
+                'errorDesc' => "错误详情：{$error}",
+            ];
+
+            return view('error', $params);
+        }
+
+        return '授权成功';
     }
 }

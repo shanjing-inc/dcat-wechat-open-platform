@@ -1,20 +1,21 @@
 {
     "name": "shanjing/dcat-wechat-open-platform",
     "alias": "",
-    "description": "Description...",
+    "description": "dcat extension for wechat open platform",
     "type": "library",
-    "keywords": ["dcat-admin", "extension"],
+    "keywords": ["dcat-admin", "extension", "wechat", "open platform"],
     "homepage": "https://github.com/shanjing/dcat-wechat-open-platform",
     "license": "MIT",
     "authors": [
         {
-            "name": "your name",
-            "email": "your email"
+            "name": "Hailong Tian",
+            "email": "tianhailong@shanjing-inc.com"
         }
     ],
     "require": {
-        "php": ">=7.1.0",
-        "dcat/laravel-admin": "~2.0"
+        "php": ">=8.1.0",
+        "dcat/laravel-admin": "~2.0",
+        "w7corp/easywechat": "^6.13"
     },
     "autoload": {
         "psr-4": {
