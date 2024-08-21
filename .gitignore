@@ -25,3 +25,4 @@ Homestead.json
 .DS_Store
 .php-cs-fixer.cache
 tmp-phpqa
+composer.lock
