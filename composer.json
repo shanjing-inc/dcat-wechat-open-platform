@@ -4,7 +4,7 @@
     "description": "dcat extension for wechat open platform",
     "type": "library",
     "keywords": ["dcat-admin", "extension", "wechat", "open platform"],
-    "homepage": "https://github.com/shanjing/dcat-wechat-open-platform",
+    "homepage": "https://github.com/shanjing-inc/dcat-wechat-open-platform",
     "license": "MIT",
     "authors": [
         {
