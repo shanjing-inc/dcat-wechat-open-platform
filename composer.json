@@ -29,5 +29,7 @@
                 "Shanjing\\DcatWechatOpenPlatform\\DcatWechatOpenPlatformServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
