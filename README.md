@@ -1,6 +1,6 @@
 # Dcat Admin Extension
 
-###路由定义
+### 路由定义
 
 > 为保证功能的正常使用，需要手动在项目的 routes/web.php 文件中定义以下路由
 

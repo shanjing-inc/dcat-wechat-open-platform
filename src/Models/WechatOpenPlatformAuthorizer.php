@@ -3,7 +3,6 @@
 namespace Shanjing\DcatWechatOpenPlatform\Models;
 
 use Dcat\Admin\Traits\HasDateTimeFormatter;
-
 use Illuminate\Database\Eloquent\Model;
 
 class WechatOpenPlatformAuthorizer extends Model
@@ -74,4 +73,31 @@ class WechatOpenPlatformAuthorizer extends Model
         self::ACCOUNT_STATUS_18  => '已告警',
         self::ACCOUNT_STATUS_19  => '已冻结',
     ];
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function platform()
+    {
+        return $this->belongsTo(WechatOpenPlatform::class, 'platform_id');
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     * @return \EasyWeChat\OfficialAccount\Application|\EasyWeChat\MiniApp\Application
+     */
+    public function getAuthorizationInstance($config = [])
+    {
+        $key  = "WechatOpenPlatformAuthorizer:{$this->id}";
+        $that = $this;
+        app()->singletonIf($key, function () use ($that, $config) {
+            $platform = $that->platform;
+            $app      = $platform->getInstance();
+            $method   = $platform->account_type == self::ACCOUNT_TYPE_OA ? 'getOfficialAccountWithRefreshToken' : 'getMiniAppWithRefreshToken';
+
+            return $app->$method($that->appid, $that->refresh_token, $config);
+        });
+
+        return app($key);
+    }
 }
