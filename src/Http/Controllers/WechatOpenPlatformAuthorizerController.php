@@ -58,6 +58,13 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
 
             });
 
+            $grid->actions(function (Grid\Displayers\Actions $actions) {
+                if ($this->account_type == WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP) {
+                    $url = admin_url("/wechat/open-platform/mini-program/{$this->id}/manage");
+                    $actions->append("<a href='{$url}' target='_blank'>版本管理</a>");
+                }
+            });
+
             $grid->disableCreateButton();
         });
     }

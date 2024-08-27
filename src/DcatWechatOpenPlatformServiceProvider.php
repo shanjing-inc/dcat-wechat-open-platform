@@ -44,6 +44,7 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
     public function init()
     {
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', BaseAdminController::TRANSLATION_NAMESPACE);
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', BaseAdminController::TRANSLATION_NAMESPACE);
 
         parent::init();
     }
