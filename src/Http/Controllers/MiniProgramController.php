@@ -9,6 +9,8 @@ use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
 use Shanjing\DcatWechatOpenPlatform\Actions\RollBackAction;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\CommitForm;
+use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\SubmitAuditForm;
+use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
 class MiniProgramController extends BaseAdminController
 {
@@ -20,16 +22,50 @@ class MiniProgramController extends BaseAdminController
             ->breadcrumb($header)
             ->body(function (Row $row) use ($authorizerId) {
                 $tab         = new Tab();
-                $form        = CommitForm::make()->payload(['authorizerId' => $authorizerId]);
-                $rollbackBtn = RollBackAction::make();
-                //                    ->setPopupFormSavedScript($this->generatedScript());
-                $modal = Modal::make()
+                $authorizer  = WechatOpenPlatformAuthorizer::find($authorizerId);
+                $client      = $authorizer->getMpClient();
+
+                $versionInfo = $client->versionInfo();
+                // 获取最新的审核版本信息
+                $result = $client->getLatestAuditStatus();
+                if ($result['errcode'] == 0) {
+                    $versionInfo['audit_info'] = $result;
+                    if ($result['status'])
+                }
+
+                if (!empty($versionInfo['release_info'])) {
+                    // 正式版小程序码
+                    $versionInfo['release_info']['qr_code'] = '';
+                    // 回退版本按钮
+                    $versionInfo['release_info']['rollback_btn'] = RollBackAction::make()->setKey($authorizerId);
+                }
+
+                if (!empty($versionInfo['exp_info'])) {
+                    // 体验版小程序码
+                    $versionInfo['exp_info']['qr_code'] = '';
+                    // 提交审核按钮（没有正在审核展示此按钮）
+                    $versionInfo['exp_info']['submit_audit_btn'] = '';
+                    if (empty($versionInfo['audit_info']) || $versionInfo['audit_info']['status'] != 2) {
+                        $submitAuditForm  = SubmitAuditForm::make()->payload(['authorizerId' => $authorizerId]);
+                        $submitAuditModal = Modal::make()
+                            ->title('提交审核')
+                            ->centered()
+                            ->xl()
+                            ->body($submitAuditForm)
+                            ->button('<button class="btn btn-primary">提交审核</button>');
+                        $versionInfo['exp_info']['submit_audit_btn'] = $submitAuditModal;
+                    }
+                }
+
+                $commitForm  = CommitForm::make()->payload(['authorizerId' => $authorizerId]);
+                $commitModal = Modal::make()
                     ->title('上传代码并生成体验版')
                     ->centered()
                     ->xl()
-                    ->body($form)
-                    ->button('<button class="btn btn-primary generate-regex-button">提交代码</button>');
-                $tab->add('版本管理', $this->view('mini-program.commit', ['modalBtn' => $modal, 'rollbackBtn' => $rollbackBtn]));
+                    ->body($commitForm)
+                    ->button('<button class="btn btn-primary">提交代码</button>');
+
+                $tab->add('版本管理', $this->view('mini-program.version', ['commitModalBtn' => $commitModal]));
                 $row->column(12, $tab->withCard());
             });
     }

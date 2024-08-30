@@ -60,9 +60,9 @@ class MpClient
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/submitAudit.html
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function submitAudit()
+    public function submitAudit($params)
     {
-        $response = $this->client->postJson('wxa/submit_audit', []);
+        $response = $this->client->postJson('wxa/submit_audit', $params);
     }
 
     /**
@@ -74,5 +74,38 @@ class MpClient
     public function undoAudit()
     {
         $response = $this->client->get('wxa/undocodeaudit');
+    }
+
+    /**
+     * 小程序版本回退
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/revertCodeRelease.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function revertCodeRelease()
+    {
+        $response = $this->client->get('wxa/revertcoderelease');
+    }
+
+    /**
+     * 获取体验版二维码
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/getTrialQRCode.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getTrialQRCode()
+    {
+        $response = $this->client->get('wxa/get_qrcode');
+    }
+
+    /**
+     * 获取最新的审核状态
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/getLatestAuditStatus.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getLatestAuditStatus()
+    {
+        $response = $this->client->get('wxa/get_latest_auditstatus');
     }
 }

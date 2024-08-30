@@ -5,6 +5,7 @@ namespace Shanjing\DcatWechatOpenPlatform\Actions;
 use App\Admin\Forms\Modal;
 use Dcat\Admin\Actions\Action;
 use Shanjing\DcatWechatOpenPlatform\Forms\CreateAuthorizerForm;
+use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
 class RollBackAction extends Action
 {
@@ -28,8 +29,10 @@ class RollBackAction extends Action
 
     public function handle()
     {
-        // 你的代码逻辑
-
+        $id         = $this->getKey();
+        $authorizer = WechatOpenPlatformAuthorizer::find($id);
+        $client     = $authorizer->getMpClient();
+        $client->revertCodeRelease();
         return $this->response()->success('回退成功')->refresh();
     }
 }
