@@ -4,7 +4,7 @@
     }
 </style>
 
-<div class="mt-2">
+<div class="mt-2 ml-2">
     <div class="card">
         <div class="card-body">
             <h3 class="">线上版本</h3>
@@ -12,6 +12,9 @@
             @if(empty($versionInfo['release_info']))
                 <p class="card-text">尚未提交线上版本</p>
             @else
+                <div class="mb-1">
+                    <img width="100px" src="{{ $versionInfo['release_info']['qr_code'] }}" />
+                </div>
                 <p class="card-text">版本号：{{ $versionInfo['release_info']['release_version'] }}</p>
                 <p class="card-text">发布时间：{{ date('Y/m/d H:i:s', $versionInfo['release_info']['release_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['release_info']['release_desc'] }}</p>

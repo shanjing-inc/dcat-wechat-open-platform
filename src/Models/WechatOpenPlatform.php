@@ -95,6 +95,21 @@ class WechatOpenPlatform extends Model
     }
 
     /**
+     * 获取代码模板列表
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/code_template/gettemplatelist.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function templateList()
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->get('/wxa/gettemplatelist');
+        $result   = $response->toArray();
+        return $result['template_list'] ?? [];
+    }
+
+    /**
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
     public function cancelAuthorizer($appid)

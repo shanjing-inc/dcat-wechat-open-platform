@@ -7,6 +7,7 @@ use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
@@ -138,6 +139,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
     public function authorizer(Request $request)
     {
         $xml = $request->getContent();
+        Log::info('授权平台请求', ['xml' => $xml]);
         $xml = simplexml_load_string($xml);
         if (empty($xml)) {
             return '请求体为空';

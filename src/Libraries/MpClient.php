@@ -28,19 +28,7 @@ class MpClient
     public function versionInfo()
     {
         $response = $this->client->postJson('wxa/getversioninfo', []);
-    }
-
-    /**
-     * 获取代码模板列表
-     *
-     * @doc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/code_template/gettemplatelist.html
-     * @author Hailong Tian <tianhailong@shanjing-inc.com>
-     */
-    public function templateList()
-    {
-        $response = $this->client->get('wxa/gettemplatelist');
-
-        dd($response);
+        return $response->toArray();
     }
 
     /**
@@ -77,6 +65,18 @@ class MpClient
     }
 
     /**
+     * 加急代码审核
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/speedupCodeAudit.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function speedupAudit($auditId)
+    {
+        $response = $this->client->postJson('wxa/speedupaudit', ['auditid' => $auditId]);
+        return $response->toArray();
+    }
+
+    /**
      * 小程序版本回退
      *
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/revertCodeRelease.html
@@ -99,6 +99,17 @@ class MpClient
     }
 
     /**
+     * 获取不限制数量的小程序码
+     *
+     * @doc https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getUnlimitedQRCode.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getUnlimitedQRCode()
+    {
+        $response = $this->client->postJson('wxa/getwxacodeunlimit', []);
+    }
+
+    /**
      * 获取最新的审核状态
      *
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/getLatestAuditStatus.html
@@ -107,5 +118,18 @@ class MpClient
     public function getLatestAuditStatus()
     {
         $response = $this->client->get('wxa/get_latest_auditstatus');
+        return $response->toArray();
+    }
+
+    /**
+     * 获取类目名称信息
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/category-management/getAllCategoryName.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getCategoryList()
+    {
+        $response = $this->client->get('wxa/get_category');
+        return $response->toArray();
     }
 }

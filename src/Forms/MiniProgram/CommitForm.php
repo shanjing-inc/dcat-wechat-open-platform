@@ -20,11 +20,10 @@ class CommitForm extends Form implements LazyRenderable
 
     public function form()
     {
-        //        $authorizer = WechatOpenPlatformAuthorizer::findOrFail($this->payload['authorizerId']);
-        //        $client     = new MpClient($authorizer->getAuthorizationInstance());
-        //        $tempList   = $client->templateList();
+        $authorizer = WechatOpenPlatformAuthorizer::findOrFail($this->payload['authorizerId']);
+        $tempList   = $authorizer->platform->templateList();
         $this->select('template_id', '模板 ID(template_id)')
-            ->options([ 1 => 'test'])
+            ->options()
             ->help('第三方平台小程序模板库的模板id。需从开发者工具上传代码到第三方平台草稿箱，然后从草稿箱添加到模板库')
             ->required();
         $this->textarea('ext_json', 'ext.json 配置 (ext_json)')

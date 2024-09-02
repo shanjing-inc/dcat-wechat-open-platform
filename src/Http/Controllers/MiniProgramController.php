@@ -8,12 +8,18 @@ use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
 use Shanjing\DcatWechatOpenPlatform\Actions\RollBackAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\UndoAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\CommitForm;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\SubmitAuditForm;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
 class MiniProgramController extends BaseAdminController
 {
+    public const AUDIT_STATUS_SUCCESS    = 0;
+    public const AUDIT_STATUS_REJECT     = 1;
+    public const AUDIT_STATUS_PROCESSING = 2;
+    public const AUDIT_STATUS_REVOKE     = 3;
+    public const AUDIT_STATUS_DELAY      = 4;
     public function manage(Content $content, $authorizerId)
     {
         $header = '授权小程序';
@@ -21,21 +27,33 @@ class MiniProgramController extends BaseAdminController
             ->breadcrumb('授权管理')
             ->breadcrumb($header)
             ->body(function (Row $row) use ($authorizerId) {
-                $tab         = new Tab();
-                $authorizer  = WechatOpenPlatformAuthorizer::find($authorizerId);
-                $client      = $authorizer->getMpClient();
+                $tab        = new Tab();
+                $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
+                $client     = $authorizer->getMpClient();
 
                 $versionInfo = $client->versionInfo();
                 // 获取最新的审核版本信息
                 $result = $client->getLatestAuditStatus();
                 if ($result['errcode'] == 0) {
                     $versionInfo['audit_info'] = $result;
-                    if ($result['status'])
+                    //  TODO 审核版本相关按钮
+                    if ($result['status'] == self::AUDIT_STATUS_SUCCESS) {
+                        // 提交发布
+                        $versionInfo['audit_info']['release_btn'] = '';
+                    } elseif (in_array($result['status'], [self::AUDIT_STATUS_REJECT, self::AUDIT_STATUS_REVOKE])) {
+                        // 提交审核
+                        $versionInfo['audit_info']['release_btn'] = '';
+                    } elseif (in_array($result['status'], [self::AUDIT_STATUS_PROCESSING, self::AUDIT_STATUS_DELAY])) {
+                        // 加急审核
+                        $versionInfo['audit_info']['speedup_btn'] = UndoAuditAction::make(null, $result['auditid'])->setKey($authorizerId);
+                        // 撤回审核
+                        $versionInfo['audit_info']['undo_btn'] = UndoAuditAction::make()->setKey($authorizerId);
+                    }
                 }
 
                 if (!empty($versionInfo['release_info'])) {
                     // 正式版小程序码
-                    $versionInfo['release_info']['qr_code'] = '';
+                    $versionInfo['release_info']['qr_code'] = $authorizer->qrcode_url;
                     // 回退版本按钮
                     $versionInfo['release_info']['rollback_btn'] = RollBackAction::make()->setKey($authorizerId);
                 }
@@ -45,7 +63,7 @@ class MiniProgramController extends BaseAdminController
                     $versionInfo['exp_info']['qr_code'] = '';
                     // 提交审核按钮（没有正在审核展示此按钮）
                     $versionInfo['exp_info']['submit_audit_btn'] = '';
-                    if (empty($versionInfo['audit_info']) || $versionInfo['audit_info']['status'] != 2) {
+                    if (empty($versionInfo['audit_info']) || $versionInfo['audit_info']['status'] != self::AUDIT_STATUS_PROCESSING) {
                         $submitAuditForm  = SubmitAuditForm::make()->payload(['authorizerId' => $authorizerId]);
                         $submitAuditModal = Modal::make()
                             ->title('提交审核')
@@ -65,7 +83,7 @@ class MiniProgramController extends BaseAdminController
                     ->body($commitForm)
                     ->button('<button class="btn btn-primary">提交代码</button>');
 
-                $tab->add('版本管理', $this->view('mini-program.version', ['commitModalBtn' => $commitModal]));
+                $tab->add('版本管理', $this->view('mini-program.version', ['commitModalBtn' => $commitModal, 'versionInfo' => $versionInfo]));
                 $row->column(12, $tab->withCard());
             });
     }
