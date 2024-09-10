@@ -34,6 +34,12 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
             'uri'    => '/wechat/open-platform/authorizer',
             'icon'   => '', // 图标可以留空
         ],
+        [
+            'parent' => '微信开放平台',
+            'title'  => '小程序模板',
+            'uri'    => '/wechat/open-platform/template',
+            'icon'   => '', // 图标可以留空
+        ],
     ];
 
     public function register()

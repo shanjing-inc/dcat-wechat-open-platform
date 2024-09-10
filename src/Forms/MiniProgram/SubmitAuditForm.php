@@ -2,18 +2,11 @@
 
 namespace Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram;
 
-use App\Admin\Controllers\Shop\ShopController;
-use App\Models\Shop\Employee;
-use App\Models\Shop\Shop;
-use App\Models\User;
 use Dcat\Admin\Contracts\LazyRenderable;
 use Dcat\Admin\Form\EmbeddedForm;
 use Dcat\Admin\Traits\LazyWidget;
 use Dcat\Admin\Widgets\Form;
-use Shanjing\DcatWechatOpenPlatform\Libraries\MpClient;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SubmitAuditForm extends Form implements LazyRenderable
 {

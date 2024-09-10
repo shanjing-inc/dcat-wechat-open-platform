@@ -34,9 +34,12 @@
                 <p class="card-text">审核 ID：{{ $versionInfo['audit_info']['auditid'] }}</p>
                 <p class="card-text">提交时间：{{ date('Y/m/d H:i:s', $versionInfo['audit_info']['submit_audit_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['audit_info']['user_desc'] }}</p>
-                <p class="card-text">审核状态：@include('mini-program.audit-status', ['status' => $versionInfo['audit_info']['status']])</p>
+                <p class="card-text">审核状态：@include($bladeNamespace . 'mini-program.audit-status', ['status' => $versionInfo['audit_info']['status']])</p>
                 @if($versionInfo['audit_info']['status'] == 1)
                     <p class="card-text">驳回原因：{{ $versionInfo['audit_info']['reason'] }}</p>
+                @elseif(in_array($versionInfo['audit_info']['status'], [2, 4]))
+                    {!! $versionInfo['audit_info']['speedup_btn'] !!}
+                    {!! $versionInfo['audit_info']['undo_btn'] !!}
                 @endif
             @endif
         </div>
@@ -49,6 +52,9 @@
             @if(empty($versionInfo['exp_info']))
                 <p class="card-text">尚未提交体验版</p>
             @else
+                <div class="mb-1">
+                    <img width="100px" src="{{ $versionInfo['exp_info']['qr_code'] }}" />
+                </div>
                 <p class="card-text">版本号：{{ $versionInfo['exp_info']['exp_version'] }}</p>
                 <p class="card-text">发布时间：{{ date('Y/m/d H:i:s', $versionInfo['exp_info']['exp_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['exp_info']['exp_desc'] }}</p>

@@ -2,20 +2,11 @@
 
 namespace Shanjing\DcatWechatOpenPlatform\Forms;
 
-use App\Admin\Controllers\Shop\ShopController;
-use App\Models\Shop\Employee;
-use App\Models\Shop\Shop;
-use App\Models\User;
 use Dcat\Admin\Admin;
 use Dcat\Admin\Contracts\LazyRenderable;
-use Dcat\Admin\Grid;
 use Dcat\Admin\Traits\LazyWidget;
 use Dcat\Admin\Widgets\Form;
-use Illuminate\Database\Eloquent\Model;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
-use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @package App\Admin\Forms

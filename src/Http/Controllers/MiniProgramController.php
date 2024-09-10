@@ -8,6 +8,7 @@ use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
 use Shanjing\DcatWechatOpenPlatform\Actions\RollBackAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SpeedupAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\UndoAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\CommitForm;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\SubmitAuditForm;
@@ -45,7 +46,7 @@ class MiniProgramController extends BaseAdminController
                         $versionInfo['audit_info']['release_btn'] = '';
                     } elseif (in_array($result['status'], [self::AUDIT_STATUS_PROCESSING, self::AUDIT_STATUS_DELAY])) {
                         // 加急审核
-                        $versionInfo['audit_info']['speedup_btn'] = UndoAuditAction::make(null, $result['auditid'])->setKey($authorizerId);
+                        $versionInfo['audit_info']['speedup_btn'] = SpeedupAuditAction::make(null, $result['auditid'])->setKey($authorizerId);
                         // 撤回审核
                         $versionInfo['audit_info']['undo_btn'] = UndoAuditAction::make()->setKey($authorizerId);
                     }
@@ -60,7 +61,7 @@ class MiniProgramController extends BaseAdminController
 
                 if (!empty($versionInfo['exp_info'])) {
                     // 体验版小程序码
-                    $versionInfo['exp_info']['qr_code'] = '';
+                    $versionInfo['exp_info']['qr_code'] = "data:image/jpeg;base64," . base64_encode($client->getTrialQRCode());
                     // 提交审核按钮（没有正在审核展示此按钮）
                     $versionInfo['exp_info']['submit_audit_btn'] = '';
                     if (empty($versionInfo['audit_info']) || $versionInfo['audit_info']['status'] != self::AUDIT_STATUS_PROCESSING) {

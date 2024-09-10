@@ -110,6 +110,99 @@ class WechatOpenPlatform extends Model
     }
 
     /**
+     * 获取草稿箱列表
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/code_template/gettemplatedraftlist.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function draftList()
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->get('/wxa/gettemplatedraftlist');
+        $result   = $response->toArray();
+        return $result['draft_list'] ?? [];
+    }
+
+    /**
+     * 创建模板
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/ThirdParty/code_template/addtotemplate.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function createTemplate($draftId, $type = WechatOpenPlatformTemplate::TEMPLATE_TYPE_0)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->postJson('/wxa/addtotemplate', ['draft_id' => $draftId, 'template_type' => $type]);
+        return $response->toArray();
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function deleteTemplate($id)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->postJson('/wxa/deletetemplate', ['template_id' => $id]);
+        return $response->toArray();
+    }
+
+    /**
+     * 同步模板库
+     *
+     * @doc
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function syncTemplateList()
+    {
+        $result   = $this->templateList();
+        $result   = array_column($result, null, 'template_id');
+        $records  = $this->templates()->get()->keyBy('template_id')->toArray();
+
+        $create = [];
+        foreach ($result as $template) {
+            if (!array_key_exists($template['template_id'], $records)) {
+                // 不存在新增
+                $data = [
+                    'platform_id'    => $this->id,
+                    'template_id'    => $template['template_id'],
+                    'template_type'    => $template['template_type'],
+                    'user_version'    => $template['user_version'],
+                    'user_desc'    => $template['user_desc'],
+                    'created_at'    => date('Y-m-d H:i:s', $template['create_time']),
+                ];
+                if ($template['template_type'] == WechatOpenPlatformTemplate::TEMPLATE_TYPE_1) {
+                    $data['category_list'] = json_encode($template['category_list']);
+                    $data['audit_status'] = $template['audit_status'];
+                    $data['reason'] = $template['reason'] ?? '';
+                }
+                $create[] = $data;
+            } else if ($template['template_type'] == WechatOpenPlatformTemplate::TEMPLATE_TYPE_1) {
+                // 存在检查是否需要更新审核状态
+                $record = $records[$template['template_id']];
+                if ($record['audit_status'] != $template['audit_status']) {
+                    WechatOpenPlatformTemplate::where('id', $record['id'])->update([
+                        'audit_status' => $template['audit_status'],
+                        'reason' => $template['reason'],
+                    ]);
+                }
+            }
+        }
+        if (!empty($create)) {
+            WechatOpenPlatformTemplate::insert($create);
+        }
+        // 删除不存在的模板
+        $newIds   = array_column($result, 'template_id');
+        $existIds = array_keys($records);
+        $deleteIds = array_diff($existIds, $newIds);
+        if (!empty($deleteIds)) {
+            WechatOpenPlatformTemplate::whereIn('template_id', $deleteIds)->delete();
+        }
+    }
+
+    /**
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
     public function cancelAuthorizer($appid)
@@ -122,5 +215,13 @@ class WechatOpenPlatform extends Model
         $authorizer->save();
 
         return $authorizer;
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function templates()
+    {
+        return $this->hasMany(WechatOpenPlatformTemplate::class, 'platform_id');
     }
 }

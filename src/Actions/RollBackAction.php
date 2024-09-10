@@ -4,7 +4,6 @@ namespace Shanjing\DcatWechatOpenPlatform\Actions;
 
 use App\Admin\Forms\Modal;
 use Dcat\Admin\Actions\Action;
-use Shanjing\DcatWechatOpenPlatform\Forms\CreateAuthorizerForm;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
 class RollBackAction extends Action

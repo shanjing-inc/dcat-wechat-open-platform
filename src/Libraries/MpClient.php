@@ -37,9 +37,10 @@ class MpClient
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/commit.html
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function commit()
+    public function commit($params)
     {
-        $response = $this->client->postJson('wxa/commit', []);
+        $response = $this->client->postJson('wxa/commit', $params);
+        return $response->toArray();
     }
 
     /**
@@ -62,6 +63,7 @@ class MpClient
     public function undoAudit()
     {
         $response = $this->client->get('wxa/undocodeaudit');
+        return $response->toArray();
     }
 
     /**
@@ -96,6 +98,7 @@ class MpClient
     public function getTrialQRCode()
     {
         $response = $this->client->get('wxa/get_qrcode');
+        return $response->getContent();
     }
 
     /**

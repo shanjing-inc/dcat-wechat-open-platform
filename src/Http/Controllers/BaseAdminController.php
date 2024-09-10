@@ -21,6 +21,6 @@ class BaseAdminController extends AdminController
      */
     protected function view($path, $data = [])
     {
-        return view(self::TRANSLATION_NAMESPACE . '::' . $path, $data);
+        return view(self::TRANSLATION_NAMESPACE . '::' . $path, $data, ['bladeNamespace' => self::TRANSLATION_NAMESPACE . '::']);
     }
 }
