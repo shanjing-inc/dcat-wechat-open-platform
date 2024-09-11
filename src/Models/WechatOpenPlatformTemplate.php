@@ -3,12 +3,11 @@
 namespace Shanjing\DcatWechatOpenPlatform\Models;
 
 use Dcat\Admin\Traits\HasDateTimeFormatter;
-
 use Illuminate\Database\Eloquent\Model;
 
 class WechatOpenPlatformTemplate extends Model
 {
-	use HasDateTimeFormatter;
+    use HasDateTimeFormatter;
     protected $table = 'wechat_open_platform_template';
 
     protected $guarded = [];
@@ -24,12 +23,12 @@ class WechatOpenPlatformTemplate extends Model
         self::TEMPLATE_TYPE_1 => '标准模板',
     ];
 
-    public const AUDIT_STATUS_0 = 0;
-    public const AUDIT_STATUS_1 = 1;
-    public const AUDIT_STATUS_2 = 2;
-    public const AUDIT_STATUS_3 = 3;
-    public const AUDIT_STATUS_4 = 4;
-    public const AUDIT_STATUS_5 = 5;
+    public const AUDIT_STATUS_0  = 0;
+    public const AUDIT_STATUS_1  = 1;
+    public const AUDIT_STATUS_2  = 2;
+    public const AUDIT_STATUS_3  = 3;
+    public const AUDIT_STATUS_4  = 4;
+    public const AUDIT_STATUS_5  = 5;
     public static $auditStatuses = [
         self::AUDIT_STATUS_0 => '未提审核',
         self::AUDIT_STATUS_1 => '审核中',

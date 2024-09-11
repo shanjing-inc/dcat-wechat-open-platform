@@ -19,6 +19,7 @@ class CommitForm extends Form implements LazyRenderable
         $options    = [];
         foreach ($tempList as $template) {
             $type = WechatOpenPlatformTemplate::$templateTypes[$template->template_type];
+            // 模板库筛选
             $options[$template->template_id] = "【{$type}】{$template->user_version} - {$template->user_desc}";
         }
         $this->select('template_id', '模板 ID(template_id)')
@@ -40,12 +41,12 @@ class CommitForm extends Form implements LazyRenderable
     public function handle($input)
     {
         $authorizer = WechatOpenPlatformAuthorizer::findOrFail($this->payload['authorizerId']);
-        $client = $authorizer->getMpClient();
-        $params = [
-            'template_id' => $input['template_id'],
-            'ext_json'    => $input['ext_json'],
+        $client     = $authorizer->getMpClient();
+        $params     = [
+            'template_id'  => $input['template_id'],
+            'ext_json'     => $input['ext_json'],
             'user_version' => $input['user_version'],
-            'user_desc' => $input['user_desc'],
+            'user_desc'    => $input['user_desc'],
         ];
         $result = $client->commit($params);
         if ($result['errcode'] != 0) {

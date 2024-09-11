@@ -119,7 +119,7 @@ class WechatOpenPlatformTemplateController extends BaseAdminController
         $options    = [];
         foreach ($records as $record) {
             $options[] = [
-                'id' => $record['draft_id'],
+                'id'   => $record['draft_id'],
                 'text' => "【{$record['user_version']}】{$record['user_desc']}",
             ];
         }

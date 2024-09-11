@@ -157,35 +157,35 @@ class WechatOpenPlatform extends Model
      */
     public function syncTemplateList()
     {
-        $result   = $this->templateList();
-        $result   = array_column($result, null, 'template_id');
-        $records  = $this->templates()->get()->keyBy('template_id')->toArray();
+        $result  = $this->templateList();
+        $result  = array_column($result, null, 'template_id');
+        $records = $this->templates()->get()->keyBy('template_id')->toArray();
 
         $create = [];
         foreach ($result as $template) {
             if (!array_key_exists($template['template_id'], $records)) {
                 // 不存在新增
                 $data = [
-                    'platform_id'    => $this->id,
-                    'template_id'    => $template['template_id'],
-                    'template_type'    => $template['template_type'],
-                    'user_version'    => $template['user_version'],
-                    'user_desc'    => $template['user_desc'],
+                    'platform_id'   => $this->id,
+                    'template_id'   => $template['template_id'],
+                    'template_type' => $template['template_type'],
+                    'user_version'  => $template['user_version'],
+                    'user_desc'     => $template['user_desc'],
                     'created_at'    => date('Y-m-d H:i:s', $template['create_time']),
                 ];
                 if ($template['template_type'] == WechatOpenPlatformTemplate::TEMPLATE_TYPE_1) {
                     $data['category_list'] = json_encode($template['category_list']);
-                    $data['audit_status'] = $template['audit_status'];
-                    $data['reason'] = $template['reason'] ?? '';
+                    $data['audit_status']  = $template['audit_status'];
+                    $data['reason']        = $template['reason'] ?? '';
                 }
                 $create[] = $data;
-            } else if ($template['template_type'] == WechatOpenPlatformTemplate::TEMPLATE_TYPE_1) {
+            } elseif ($template['template_type'] == WechatOpenPlatformTemplate::TEMPLATE_TYPE_1) {
                 // 存在检查是否需要更新审核状态
                 $record = $records[$template['template_id']];
                 if ($record['audit_status'] != $template['audit_status']) {
                     WechatOpenPlatformTemplate::where('id', $record['id'])->update([
                         'audit_status' => $template['audit_status'],
-                        'reason' => $template['reason'],
+                        'reason'       => $template['reason'],
                     ]);
                 }
             }
@@ -194,8 +194,8 @@ class WechatOpenPlatform extends Model
             WechatOpenPlatformTemplate::insert($create);
         }
         // 删除不存在的模板
-        $newIds   = array_column($result, 'template_id');
-        $existIds = array_keys($records);
+        $newIds    = array_column($result, 'template_id');
+        $existIds  = array_keys($records);
         $deleteIds = array_diff($existIds, $newIds);
         if (!empty($deleteIds)) {
             WechatOpenPlatformTemplate::whereIn('template_id', $deleteIds)->delete();
