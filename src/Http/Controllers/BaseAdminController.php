@@ -15,4 +15,12 @@ class BaseAdminController extends AdminController
 
         return self::TRANSLATION_NAMESPACE . '::' . admin_controller_slug();
     }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    protected function view($path, $data = [])
+    {
+        return view(self::TRANSLATION_NAMESPACE . '::' . $path, $data, ['bladeNamespace' => self::TRANSLATION_NAMESPACE . '::']);
+    }
 }
