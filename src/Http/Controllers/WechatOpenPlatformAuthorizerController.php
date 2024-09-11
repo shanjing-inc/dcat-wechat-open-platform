@@ -7,6 +7,7 @@ use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
@@ -56,6 +57,13 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                 $filter->equal('platform_id')->width(2);
                 $filter->equal('appid')->width(2);
 
+            });
+
+            $grid->actions(function (Grid\Displayers\Actions $actions) {
+                if ($this->account_type == WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP) {
+                    $url = admin_url("/wechat/open-platform/mini-program/{$this->id}/manage");
+                    $actions->append("<a href='{$url}' target='_blank'>版本管理</a>");
+                }
             });
 
             $grid->disableCreateButton();
@@ -131,6 +139,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
     public function authorizer(Request $request)
     {
         $xml = $request->getContent();
+        Log::info('授权平台请求', ['xml' => $xml]);
         $xml = simplexml_load_string($xml);
         if (empty($xml)) {
             return '请求体为空';

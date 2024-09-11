@@ -4,6 +4,8 @@ namespace Shanjing\DcatWechatOpenPlatform\Models;
 
 use Dcat\Admin\Traits\HasDateTimeFormatter;
 use Illuminate\Database\Eloquent\Model;
+use Shanjing\DcatWechatOpenPlatform\Libraries\MpClient;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class WechatOpenPlatformAuthorizer extends Model
 {
@@ -99,5 +101,18 @@ class WechatOpenPlatformAuthorizer extends Model
         });
 
         return app($key);
+    }
+
+    /**
+     * @return MpClient
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getMpClient($config = [])
+    {
+        if ($this->account_type != self::ACCOUNT_TYPE_MP) {
+            throw new AccessDeniedHttpException('非小程序类型账号');
+        }
+
+        return new MpClient($this->getAuthorizationInstance($config));
     }
 }
