@@ -40,6 +40,8 @@
                 @elseif(in_array($versionInfo['audit_info']['status'], [2, 4]))
                     {!! $versionInfo['audit_info']['speedup_btn'] !!}
                     {!! $versionInfo['audit_info']['undo_btn'] !!}
+                @elseif($versionInfo['audit_info']['status'] == 0)
+                    {!! $versionInfo['audit_info']['release_btn'] !!}
                 @endif
             @endif
         </div>

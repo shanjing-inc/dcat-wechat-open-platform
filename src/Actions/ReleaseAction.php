@@ -6,19 +6,13 @@ use App\Admin\Forms\Modal;
 use Dcat\Admin\Actions\Action;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
-class SpeedupAuditAction extends Action
+class ReleaseAction extends Action
 {
     /**
      * 按钮标题
      * @var string
      */
-    protected $title = '<button class="btn btn-primary">加急审核</button>';
-
-    public function __construct($title = null, $auditId = null)
-    {
-        parent::__construct($title);
-        $this->auditId = $auditId;
-    }
+    protected $title = '<button class="btn btn-danger">提交发布</button>';
 
     /**
      * 弹框
@@ -29,20 +23,18 @@ class SpeedupAuditAction extends Action
     public function confirm()
     {
         // 显示标题和内容
-        return '您确定要加急审核吗？';
+        return '您确定发布此版本吗？';
     }
 
     public function handle()
     {
         $id         = $this->getKey();
-        $auditId    = request('auditId');
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
         $client     = $authorizer->getMpClient();
-        $result     = $client->speedupAudit($auditId);
+        $result     = $client->release();
         if ($result['errcode'] != 0) {
-            return $this->response()->error('加急失败：' . $result['errmsg']);
+            return $this->response()->error('发布失败：' . $result['errmsg']);
         }
-
-        return $this->response()->success('加急成功')->refresh();
+        return $this->response()->success('发布成功')->refresh();
     }
 }

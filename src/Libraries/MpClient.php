@@ -79,6 +79,18 @@ class MpClient
     }
 
     /**
+     * 发布已通过审核的小程序
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/release.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function release()
+    {
+        $response = $this->client->postJson('wxa/release', []);
+        return $response->toArray();
+    }
+
+    /**
      * 小程序版本回退
      *
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/revertCodeRelease.html
@@ -87,6 +99,7 @@ class MpClient
     public function revertCodeRelease()
     {
         $response = $this->client->get('wxa/revertcoderelease');
+        return $response->toArray();
     }
 
     /**

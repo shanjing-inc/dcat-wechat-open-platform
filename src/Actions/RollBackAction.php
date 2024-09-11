@@ -31,7 +31,10 @@ class RollBackAction extends Action
         $id         = $this->getKey();
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
         $client     = $authorizer->getMpClient();
-        $client->revertCodeRelease();
+        $result     = $client->revertCodeRelease();
+        if ($result['errcode'] != 0) {
+            return $this->response()->error('回退失败：' . $result['errmsg']);
+        }
         return $this->response()->success('回退成功')->refresh();
     }
 }

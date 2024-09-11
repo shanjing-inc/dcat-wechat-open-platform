@@ -7,6 +7,7 @@ use Dcat\Admin\Layout\Content;
 use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
+use Shanjing\DcatWechatOpenPlatform\Actions\ReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\RollBackAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SpeedupAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\UndoAuditAction;
@@ -40,10 +41,10 @@ class MiniProgramController extends BaseAdminController
                     //  TODO 审核版本相关按钮
                     if ($result['status'] == self::AUDIT_STATUS_SUCCESS) {
                         // 提交发布
-                        $versionInfo['audit_info']['release_btn'] = '';
+                        $versionInfo['audit_info']['release_btn'] = ReleaseAction::make()->setKey($authorizerId);
                     } elseif (in_array($result['status'], [self::AUDIT_STATUS_REJECT, self::AUDIT_STATUS_REVOKE])) {
                         // 提交审核
-                        $versionInfo['audit_info']['release_btn'] = '';
+                        $versionInfo['audit_info']['submit_audit_btn'] = '';
                     } elseif (in_array($result['status'], [self::AUDIT_STATUS_PROCESSING, self::AUDIT_STATUS_DELAY])) {
                         // 加急审核
                         $versionInfo['audit_info']['speedup_btn'] = SpeedupAuditAction::make(null, $result['auditid'])->setKey($authorizerId);
