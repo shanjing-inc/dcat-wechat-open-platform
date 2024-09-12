@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Shanjing\DcatWechatOpenPlatform\DcatWechatOpenPlatformServiceProvider as ServiceProvider;
 use Shanjing\DcatWechatOpenPlatform\Libraries\MpClient;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WechatOpenPlatformAuthorizer extends Model
 {
@@ -119,5 +120,14 @@ class WechatOpenPlatformAuthorizer extends Model
         }
 
         return new MpClient($this->getAuthorizationInstance($config));
+    }
+
+    public static function getApplicationByAppid($appid)
+    {
+        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $args['appid'])->first();
+        if (!$authorizer) {
+            throw new NotFoundHttpException('未查询到授权平台：' . $args['appid']);
+        }
+        return $authorizer->getAuthorizationInstance();
     }
 }

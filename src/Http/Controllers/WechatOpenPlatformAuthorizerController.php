@@ -8,6 +8,7 @@ use Dcat\Admin\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Shanjing\DcatWechatOpenPlatform\Actions\UpdateAuthInfoAction;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
@@ -32,9 +33,9 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
         return Grid::make(new WechatOpenPlatformAuthorizer(), function (Grid $grid) {
             $grid->column('id')->sortable();
             $grid->column('platform_id');
+            $grid->column('nickname');
             $grid->column('appid');
             $grid->column('username');
-            $grid->column('nickname');
             $grid->column('head_img')->image('', 100, 100);
             $grid->column('account_type')->using(WechatOpenPlatformAuthorizer::$accountTypes);
             $grid->column('service_type')->if(function () {
@@ -64,6 +65,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                     $url = admin_url("/wechat/open-platform/mini-program/{$this->id}/manage");
                     $actions->append("<a href='{$url}' target='_blank'>版本管理</a>");
                 }
+                $actions->append(new UpdateAuthInfoAction());
             });
 
             $grid->disableCreateButton();
