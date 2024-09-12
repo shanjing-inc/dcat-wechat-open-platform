@@ -3,8 +3,11 @@
 namespace Shanjing\DcatWechatOpenPlatform\Models;
 
 use Dcat\Admin\Traits\HasDateTimeFormatter;
+use EasyWeChat\Kernel\Traits\InteractWithConfig;
 use EasyWeChat\OpenPlatform\Application;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Shanjing\DcatWechatOpenPlatform\DcatWechatOpenPlatformServiceProvider as ServiceProvider;
 
 class WechatOpenPlatform extends Model
 {
@@ -50,7 +53,11 @@ class WechatOpenPlatform extends Model
             //多个服务端公用 access_token 时开启
             //setAccessTokenCacheOfEw($app);
 
-            return new Application($config);
+            $app   = new Application($config);
+            $cache = ServiceProvider::setting('cache_store', config('cache.default'));
+            $app->setCache(Cache::store($cache));
+
+            return $app;
         });
 
         return app($key);
@@ -66,7 +73,7 @@ class WechatOpenPlatform extends Model
         $response = $api->post('/cgi-bin/component/api_get_authorizer_info', [
             'json' => [
                 "component_appid"  => $this->appid,
-                "authorizer_appid" => "wx72d4f7ef5710dc39"
+                "authorizer_appid" => $appid
             ]
         ]);
         $result            = $response->getContent();
