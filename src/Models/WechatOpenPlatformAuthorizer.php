@@ -4,6 +4,8 @@ namespace Shanjing\DcatWechatOpenPlatform\Models;
 
 use Dcat\Admin\Traits\HasDateTimeFormatter;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
+use Shanjing\DcatWechatOpenPlatform\DcatWechatOpenPlatformServiceProvider as ServiceProvider;
 use Shanjing\DcatWechatOpenPlatform\Libraries\MpClient;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -97,7 +99,10 @@ class WechatOpenPlatformAuthorizer extends Model
             $app      = $platform->getInstance();
             $method   = $platform->account_type == self::ACCOUNT_TYPE_OA ? 'getOfficialAccountWithRefreshToken' : 'getMiniAppWithRefreshToken';
 
-            return $app->$method($that->appid, $that->refresh_token, $config);
+            $subApp = $app->$method($that->appid, $that->refresh_token, $config);
+            $cache = ServiceProvider::setting('cache_store', config('cache.default'));
+            $subApp->setCache(Cache::store($cache));
+            return $subApp;
         });
 
         return app($key);

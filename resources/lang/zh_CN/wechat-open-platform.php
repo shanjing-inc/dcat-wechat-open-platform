@@ -8,8 +8,8 @@ return [
         'name' => '名称',
         'appid' => 'appid',
         'secret' => 'secret',
-        'token' => 'token',
-        'aes_key' => 'aes_key',
+        'token' => '消息校验 Token',
+        'aes_key' => '消息加解密 Key',
     ],
     'options' => [
     ],

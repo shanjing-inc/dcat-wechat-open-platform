@@ -44,11 +44,11 @@ class DcatWechatOpenPlatformServiceProvider extends ServiceProvider
 
     public function register()
     {
-        //
     }
 
     public function init()
     {
+        $this->loadRoutesFrom(__DIR__ . '/../src/Http/web.php');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', BaseAdminController::TRANSLATION_NAMESPACE);
         $this->loadViewsFrom(__DIR__ . '/../resources/views', BaseAdminController::TRANSLATION_NAMESPACE);
 
