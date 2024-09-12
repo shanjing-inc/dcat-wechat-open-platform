@@ -70,14 +70,11 @@ class WechatOpenPlatform extends Model
     {
         $app      = $this->getInstance();
         $api      = $app->getClient();
-        $response = $api->post('/cgi-bin/component/api_get_authorizer_info', [
-            'json' => [
-                "component_appid"  => $this->appid,
-                "authorizer_appid" => $appid
-            ]
+        $response = $api->postJson('/cgi-bin/component/api_get_authorizer_info', [
+            "component_appid"  => $this->appid,
+            "authorizer_appid" => $appid
         ]);
-        $result            = $response->getContent();
-        $result            = json_decode($result, true);
+        $result            = $response->toArray();
         $authorizerInfo    = $result['authorizer_info'];
         $authorizationInfo = $result['authorization_info'];
         $authorizer        = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
