@@ -124,9 +124,9 @@ class WechatOpenPlatformAuthorizer extends Model
 
     public static function getApplicationByAppid($appid)
     {
-        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $args['appid'])->first();
+        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $appid)->first();
         if (!$authorizer) {
-            throw new NotFoundHttpException('未查询到授权平台：' . $args['appid']);
+            throw new NotFoundHttpException('未查询到授权平台：' . $appid);
         }
         return $authorizer->getAuthorizationInstance();
     }
