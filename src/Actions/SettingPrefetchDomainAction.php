@@ -12,7 +12,7 @@ class SettingPrefetchDomainAction extends RowAction
      * 按钮标题
      * @var string
      */
-    protected $title = '配置DNS预解析域名';
+    protected $title = '配置预解析域名';
 
     /**
      * 弹框

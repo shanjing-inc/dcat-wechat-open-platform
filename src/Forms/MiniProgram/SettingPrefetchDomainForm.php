@@ -20,7 +20,7 @@ class SettingPrefetchDomainForm extends Form implements LazyRenderable
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
         $client     = $authorizer->getMpClient();
         $domains    = $client->getPrefetchDomain();
-        $this->list('prefetch_dns_domain', 'DNS预解析域名')->default(Arr::pluck($domains['prefetch_dns_domain'], 'url'));
+        $this->list('prefetch_dns_domain', '预解析域名')->default(Arr::pluck($domains['prefetch_dns_domain'], 'url'));
     }
 
     public function handle($input)

@@ -19,16 +19,8 @@ class CreateAuthorizerToolForm extends Form implements LazyRenderable
             ->options($platforms);
     }
 
-    /**
-     * @author Hailong Tian <tianhailong@shanjing-inc.com>
-     */
-    protected function renderSubmitButton()
-    {
-        return "<button type=\"submit\" class=\"btn btn-primary pull-right\"><i class=\"feather icon-save\"></i> {$this->getSubmitButtonLabel()}</button>";
-    }
-
     public function handle($input)
     {
-        $platform = WechatOpenPlatform::find($input['platform_id']);
+        return $this->html();
     }
 }
