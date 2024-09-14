@@ -77,7 +77,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             });
 
             $grid->tools(function (Grid\Tools $tools) {
-                //                $tools->append(new CreateAuthorizerToolAction());
+                $tools->append(new CreateAuthorizerToolAction());
             });
 
             $grid->disableCreateButton();
