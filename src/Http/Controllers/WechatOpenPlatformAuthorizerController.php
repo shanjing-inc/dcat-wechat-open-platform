@@ -8,6 +8,10 @@ use Dcat\Admin\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SettingJumpDomainAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrefetchDomainAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SettingServerDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\UpdateAuthInfoAction;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
@@ -61,11 +65,19 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             });
 
             $grid->actions(function (Grid\Displayers\Actions $actions) {
+                $actions->append(new UpdateAuthInfoAction());
+
                 if ($this->account_type == WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP) {
                     $url = admin_url("/wechat/open-platform/mini-program/{$this->id}/manage");
-                    $actions->append("<a href='{$url}' target='_blank'>版本管理</a>");
+                    $actions->append("<a href='{$url}' target='_blank'>小程序版本管理</a>");
+                    $actions->append(new SettingServerDomainAction());
+                    $actions->append(new SettingJumpDomainAction());
+                    $actions->append(new SettingPrefetchDomainAction());
                 }
-                $actions->append(new UpdateAuthInfoAction());
+            });
+
+            $grid->tools(function (Grid\Tools $tools) {
+                //                $tools->append(new CreateAuthorizerToolAction());
             });
 
             $grid->disableCreateButton();

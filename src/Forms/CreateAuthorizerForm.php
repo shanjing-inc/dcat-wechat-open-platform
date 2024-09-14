@@ -60,6 +60,7 @@ HTML;
 <div>
     <div class="alert alert-success">H5 版授权链接在手机微信里直接访问授权链接 {$button}
     </div>
+    <p class="help-block">授权链接只能使用一次，有效时间 30 分钟，如果失效请重新打开本窗口获取新的授权链接。</p>
 </div>
 HTML;
             $this->html($text);
