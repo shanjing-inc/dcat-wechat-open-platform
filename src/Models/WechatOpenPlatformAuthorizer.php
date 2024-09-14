@@ -101,7 +101,7 @@ class WechatOpenPlatformAuthorizer extends Model
             $method   = $platform->account_type == self::ACCOUNT_TYPE_OA ? 'getOfficialAccountWithRefreshToken' : 'getMiniAppWithRefreshToken';
 
             $subApp = $app->$method($that->appid, $that->refresh_token, $config);
-            $cache = ServiceProvider::setting('cache_store', config('cache.default'));
+            $cache  = ServiceProvider::setting('cache_store', config('cache.default'));
             $subApp->setCache(Cache::store($cache));
             return $subApp;
         });

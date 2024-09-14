@@ -22,7 +22,7 @@ class UpdateAuthInfoAction extends RowAction
     public function confirm()
     {
         // 显示标题和内容
-        return '您确定更新授权信息吗？';
+        return ['您确定更新授权信息吗？', '通过 <a class="text-primary" href="https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/authorization-management/getAuthorizerInfo.html" target="_blank">开放平台-获取授权账号详情接口</a> 获取最新的授权信息覆盖更新到本地数据库中'];
     }
 
     public function handle()

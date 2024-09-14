@@ -123,6 +123,7 @@ class MpClient
     public function getUnlimitedQRCode()
     {
         $response = $this->client->postJson('wxa/getwxacodeunlimit', []);
+        return $response->getContent();
     }
 
     /**
@@ -146,6 +147,125 @@ class MpClient
     public function getCategoryList()
     {
         $response = $this->client->get('wxa/get_category');
+        return $response->toArray();
+    }
+
+    /**
+     * 配置服务器域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/modifyServerDomain.html
+     * @params $action add delete set get
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setServerDomain($action, $params = [])
+    {
+        $params['action'] = $action;
+        $response         = $this->client->postJson('wxa/modify_domain', $params);
+        return $response->toArray();
+    }
+
+    /**
+     * 快速配置服务器域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/modifyServerDomainDirectly.html
+     * @params $action add delete set get
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setServerDomainDirectly($action, $params = [])
+    {
+        $params['action'] = $action;
+        $response         = $this->client->postJson('wxa/modify_domain_directly', $params);
+        return $response->toArray();
+    }
+
+    /**
+     * 获取生效的服务器域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/getEffectiveServerDomain.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     * @since  2024/9/13
+     */
+    public function getEffectiveServerDomain()
+    {
+        $response = $this->client->postJson('wxa/get_effective_domain', []);
+        return $response->toArray();
+    }
+
+    /**
+     * 获取生效的业务域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/getEffectiveJumpDomain.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     * @since  2024/9/13
+     */
+    public function getEffectiveJumpDomain()
+    {
+        $response = $this->client->postJson('wxa/get_effective_webviewdomain', []);
+        return $response->toArray();
+    }
+
+    /**
+     * 获取业务域名校验文件
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/getJumpDomainConfirmFile.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     * @since  2024/9/13
+     */
+    public function getJumpDomainConfirmFile()
+    {
+        $response = $this->client->postJson('wxa/get_webviewdomain_confirmfile', []);
+        return $response->toArray();
+    }
+
+    /**
+     * 配置业务域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/modifyServerDomain.html
+     * @params $action add delete set get
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setJumpDomain($action, $params = [])
+    {
+        $params['action'] = $action;
+        $response         = $this->client->postJson('wxa/setwebviewdomain', $params);
+        return $response->toArray();
+    }
+
+    /**
+     * 快速配置业务域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/modifyServerDomainDirectly.html
+     * @params $action add delete set get
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setJumpDomainDirectly($action, $params = [])
+    {
+        $params['action'] = $action;
+        $response         = $this->client->postJson('wxa/setwebviewdomain_directly', $params);
+        return $response->toArray();
+    }
+
+    /**
+     * 获取DNS预解析域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/getPrefetchDomain.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getPrefetchDomain()
+    {
+        $response = $this->client->get('wxa/get_prefetchdnsdomain');
+        return $response->toArray();
+    }
+
+    /**
+     * 配置DNS预解析域名
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/domain-management/setPrefetchDomain.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setPrefetchDomain($params = [])
+    {
+        $response = $this->client->postJson('wxa/set_prefetchdnsdomain', $params);
         return $response->toArray();
     }
 }

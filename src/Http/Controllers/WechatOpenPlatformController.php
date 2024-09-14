@@ -88,13 +88,14 @@ $('.grid-column-copyable').off('click').on('click', function (e) {
 });
 JS;
             Admin::script($script);
-            $host       = request()->schemeAndHttpHost();
-            $route      = ServiceProvider::setting('auth_route_path_webhook', Setting::AUTH_ROUTE_PATH_WEBHOOK);;
+            $host  = request()->schemeAndHttpHost();
+            $route = ServiceProvider::setting('auth_route_path_webhook', Setting::AUTH_ROUTE_PATH_WEBHOOK);
+            ;
             $authUrl    = rtrim($host, '/') . '/' . ltrim($route, '/');
             $authUrl    = rtrim($authUrl, '/');
             $settingUrl = admin_url('auth/extensions');
             $eventUrl   = "{$authUrl}/\$APPID$";
-            $tips = <<<HTML
+            $tips       = <<<HTML
         <div style=" padding: 20px; background: #e6f7ff;">
           <p>- 需要在 <a class="text-primary" href="https://open.weixin.qq.com" target="_blank">开放平台</a> 后台配置 "授权事件接收配置" 和 "消息与事件接收配置" 才能生效</p>
           <p>- 授权事件接收配置： <a class="text-primary grid-column-copyable"
