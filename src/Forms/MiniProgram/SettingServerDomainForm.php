@@ -29,7 +29,7 @@ class SettingServerDomainForm extends Form implements LazyRenderable
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
         $client     = $authorizer->getMpClient();
         $domains    = $client->getEffectiveServerDomain();
-        $this->html($this->showEffectiveDomains($domains['effective_domain']));
+        $this->html($this->showEffectiveDomains($domains['effective_domain'] ?? []));
         $this->radio('type')->options([
             self::SERVER_DOMAIN_TYPE_DEFAULT => '服务商域名',
             self::SERVER_DOMAIN_TYPE_QUICK   => '商家域名',
