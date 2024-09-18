@@ -39,7 +39,7 @@ class SettingServerDomainForm extends Form implements LazyRenderable
             $default = $domains['third_domain'];
             $form->embeds('third_domain', '', function ($form) use ($default) {
                 $form->list('requestdomain', 'request 合法域名')->default($default['requestdomain'])->help('以 https:// 开头');
-                $form->list('wsrequestdomain', 'uploadFile 合法域名')->default($default['wsrequestdomain'])->help('以 wss:// 开头');
+                $form->list('wsrequestdomain', 'socket 合法域名')->default($default['wsrequestdomain'])->help('以 wss:// 开头');
                 $form->list('uploaddomain', 'uploadFile 合法域名')->default($default['uploaddomain'])->help('以 https:// 开头');
                 $form->list('downloaddomain', 'downloadFile 合法域名')->default($default['downloaddomain'])->help('以 https:// 开头');
                 $form->list('udpdomain', 'udp 合法域名')->default($default['udpdomain'])->help('以 udp:// 开头');
@@ -51,7 +51,7 @@ class SettingServerDomainForm extends Form implements LazyRenderable
             $default = $domains['direct_domain'];
             $form->embeds('direct_domain', '', function ($form) use ($default) {
                 $form->list('requestdomain', 'request 合法域名')->default($default['requestdomain'])->help('以 https:// 开头');
-                $form->list('wsrequestdomain', 'uploadFile 合法域名')->default($default['wsrequestdomain'])->help('以 wss:// 开头');
+                $form->list('wsrequestdomain', 'socket 合法域名')->default($default['wsrequestdomain'])->help('以 wss:// 开头');
                 $form->list('uploaddomain', 'uploadFile 合法域名')->default($default['uploaddomain'])->help('以 https:// 开头');
                 $form->list('downloaddomain', 'downloadFile 合法域名')->default($default['downloaddomain'])->help('以 https:// 开头');
                 $form->list('udpdomain', 'udp 合法域名')->default($default['udpdomain'])->help('以 udp:// 开头');
