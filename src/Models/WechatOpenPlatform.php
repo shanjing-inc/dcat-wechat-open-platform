@@ -154,6 +154,17 @@ class WechatOpenPlatform extends Model
     }
 
     /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function code2Session($appid, $code)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->get('/sns/component/jscode2session', ['appid' => $appid, 'component_appid' => $this->appid, 'js_code' => $code, 'grant_type' => 'authorization_code']);
+        return $response->toArray();
+    }
+    
+    /**
      * 同步模板库
      *
      * @doc
