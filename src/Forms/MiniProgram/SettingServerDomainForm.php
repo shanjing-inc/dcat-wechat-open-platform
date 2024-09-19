@@ -68,7 +68,17 @@ class SettingServerDomainForm extends Form implements LazyRenderable
 
         $type = $input['type'];
         if ($type == self::SERVER_DOMAIN_TYPE_QUICK) {
-            $params = $input['direct_domain'];
+            $params  = $input['direct_domain'];
+            $origin  = $client->setServerDomainDirectly('get');
+            $deleted = [];
+            foreach ($params as $key => $value) {
+                if (empty($value) &&  !empty($origin[$key])) {
+                    $deleted[$key] = $origin[$key];
+                }
+            }
+            if (!empty($deleted)) {
+                $client->setServerDomainDirectly('delete', $deleted);
+            }
             $result = $client->setServerDomainDirectly('set', $params);
         } else {
             $params = $input['third_domain'];
