@@ -72,7 +72,7 @@ class SettingServerDomainForm extends Form implements LazyRenderable
             $origin  = $client->setServerDomainDirectly('get');
             $deleted = [];
             foreach ($params as $key => $value) {
-                if (empty($value) &&  !empty($origin[$key])) {
+                if (empty($value) && !empty($origin[$key])) {
                     $deleted[$key] = $origin[$key];
                 }
             }

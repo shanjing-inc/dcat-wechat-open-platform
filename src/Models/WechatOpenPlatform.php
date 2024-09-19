@@ -163,7 +163,7 @@ class WechatOpenPlatform extends Model
         $response = $api->get('/sns/component/jscode2session', ['appid' => $appid, 'component_appid' => $this->appid, 'js_code' => $code, 'grant_type' => 'authorization_code']);
         return $response->toArray();
     }
-    
+
     /**
      * 同步模板库
      *
