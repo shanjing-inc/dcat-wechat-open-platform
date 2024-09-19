@@ -268,4 +268,29 @@ class MpClient
         $response = $this->client->postJson('wxa/set_prefetchdnsdomain', $params);
         return $response->toArray();
     }
+
+    /**
+     * 获取小程序用户隐私保护指引
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/privacy-management/getPrivacySetting.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getPrivacySetting()
+    {
+        $response = $this->client->postJson('cgi-bin/component/getprivacysetting', ['privacy_ver' => 2]);
+        return $response->toArray();
+    }
+
+    /**
+     * 设置小程序用户隐私保护指引
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/privacy-management/setPrivacySetting.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function setPrivacySetting($params)
+    {
+        $params['privacy_ver'] = 2;
+        $response              = $this->client->postJson('cgi-bin/component/setprivacysetting', $params);
+        return $response->toArray();
+    }
 }
