@@ -74,9 +74,9 @@ class SettingPrivacyForm extends Form implements LazyRenderable
         $client     = $authorizer->getMpClient();
         $result     = $client->setPrivacySetting($data);
         if ($result['errcode'] != 0) {
-            return $this->response()->error('设置小程序用户隐私保护指引配置失败：' . $result['errmsg']);
+            return $this->response()->error('配置用户隐私协议失败：' . $result['errmsg']);
         }
 
-        return $this->response()->success('设置小程序用户隐私保护指引配置成功')->refresh();
+        return $this->response()->success('配置用户隐私协议成功')->refresh();
     }
 }
