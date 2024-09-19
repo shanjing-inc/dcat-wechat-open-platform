@@ -12,7 +12,7 @@ class SettingPrivacyAction extends RowAction
      * 按钮标题
      * @var string
      */
-    protected $title = '小程序用户隐私保护指引';
+    protected $title = '配置用户隐私协议';
 
     /**
      * 弹框
