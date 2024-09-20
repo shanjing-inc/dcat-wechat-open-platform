@@ -38,11 +38,4 @@ class UndoAuditAction extends Action
 
         return $this->response()->success('撤回成功')->refresh();
     }
-
-    public function parameters()
-    {
-        return [
-            'aduitId' => $this->auditId,
-        ];
-    }
 }
