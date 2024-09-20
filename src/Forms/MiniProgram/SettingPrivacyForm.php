@@ -67,7 +67,7 @@ class SettingPrivacyForm extends Form implements LazyRenderable
         }
         $data['owner_setting']['notice_method'] = $input['notice_method'];
         $data['setting_list']                   = $input['setting_list'];
-        $data['sdk_privacy_info_list']          = $input['sdk_privacy_info_list'];
+        $data['sdk_privacy_info_list']          = $input['sdk_privacy_info_list'] ?? [];
 
         $id         = $this->payload['id'] ?? null;
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
