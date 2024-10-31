@@ -6,5 +6,6 @@ return [
         '2024_08_15_135942_create_wechat_open_platform_table.php',
         '2024_08_15_161102_create_wechat_open_platform_authorizer_table.php',
         '2024_09_10_110846_create_wechat_open_platform_template_table.php',
+        '2024_10_31_144105_add_ext_json_to_wechat_open_platform_authorizer_table.php',
     ],
 ];

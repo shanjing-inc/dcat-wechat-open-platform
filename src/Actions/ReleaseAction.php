@@ -12,7 +12,7 @@ class ReleaseAction extends Action
      * 按钮标题
      * @var string
      */
-    protected $title = '<button class="btn btn-danger">提交发布</button>';
+    protected $title = '<button class="btn btn-primary">提交发布</button>';
 
     /**
      * 弹框

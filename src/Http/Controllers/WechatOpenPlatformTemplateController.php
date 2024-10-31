@@ -22,6 +22,7 @@ class WechatOpenPlatformTemplateController extends BaseAdminController
     protected function grid()
     {
         return Grid::make(new WechatOpenPlatformTemplate(), function (Grid $grid) {
+            $grid->model()->orderByDesc('id');
             $grid->column('id')->sortable();
             $grid->column('platform_id');
             $grid->column('template_id');
