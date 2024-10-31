@@ -32,7 +32,7 @@ class CommitForm extends Form implements LazyRenderable
         $this->textarea('ext_json', 'ext.json 配置 (ext_json)')
             ->rows(3)
             ->help("用于控制 ext.json 配置文件的内容的参数， <a href='https://developers.weixin.qq.com/miniprogram/dev/devtools/ext.html#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%A8%A1%E6%9D%BF%E5%BC%80%E5%8F%91' target='_blank'>ext.json 说明</a>")
-            ->default($authorizer->ext_json)
+            ->default($authorizer->ext_json ?? '')
             ->required();
         $version = $this->text('user_version', '代码版本号 (user_version)')
             ->help('代码版本号，开发者可自定义(长度不超过64个字符)')
