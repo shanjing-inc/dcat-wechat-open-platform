@@ -83,7 +83,7 @@ class MiniProgramController extends BaseAdminController
                     ->centered()
                     ->xl()
                     ->body($commitForm)
-                    ->button('<button class="btn btn-primary">提交代码</button>');
+                    ->button('<button class="btn btn-primary pull-left mr-2">提交代码</button>');
 
                 $tab->add('版本管理', $this->view('mini-program.version', ['commitModalBtn' => $commitModal, 'versionInfo' => $versionInfo]));
                 $row->column(12, $tab->withCard());
