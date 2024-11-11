@@ -23,7 +23,7 @@ class GrayReleaseForm extends Form implements LazyRenderable
         if ($detail['errcode'] != 0) {
             throw new BadRequestHttpException('获取灰度发布计划失败：' . $detail['errmsg']);
         }
-        $plan = $detail['gray_release_plan'];
+        $plan   = $detail['gray_release_plan'];
         $status = [
             '0' => '未发布',
             '1' => '执行中',
@@ -54,8 +54,8 @@ class GrayReleaseForm extends Form implements LazyRenderable
             return $this->response()->error('灰度百分比为 0 时必须选择灰度白名单');
         }
         $params = [
-            'gray_percentage'       => (int)$input['gray_percentage'],
-            'support_debuger_first' => array_search('support_debuger_first', $input['whitelist']) !== false,
+            'gray_percentage'           => (int)$input['gray_percentage'],
+            'support_debuger_first'     => array_search('support_debuger_first', $input['whitelist']) !== false,
             'support_experiencer_first' => array_search('support_experiencer_first', $input['whitelist']) !== false,
         ];
         $result = $client->grayRelease($params);
