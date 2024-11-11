@@ -91,6 +91,42 @@ class MpClient
     }
 
     /**
+     * 获取分阶段发布详情
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/getGrayReleasePlan.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getGrayReleasePlan()
+    {
+        $response = $this->client->get('wxa/getgrayreleaseplan');
+        return $response->toArray();
+    }
+
+    /**
+     * 分阶段发布
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/grayRelease.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function grayRelease()
+    {
+        $response = $this->client->postJson('wxa/grayrelease');
+        return $response->toArray();
+    }
+
+    /**
+     * 取消分阶段发布
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/revertGrayRelease.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function revertGrayRelease()
+    {
+        $response = $this->client->get('wxa/revertgrayrelease');
+        return $response->toArray();
+    }
+
+    /**
      * 小程序版本回退
      *
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/revertCodeRelease.html
