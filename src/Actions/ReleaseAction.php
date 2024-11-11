@@ -12,7 +12,7 @@ class ReleaseAction extends Action
      * 按钮标题
      * @var string
      */
-    protected $title = '<button class="btn btn-primary">提交发布</button>';
+    protected $title = '<button class="btn btn-primary">全量发布</button>';
 
     /**
      * 弹框
@@ -23,7 +23,7 @@ class ReleaseAction extends Action
     public function confirm()
     {
         // 显示标题和内容
-        return '您确定发布此版本吗？';
+        return '您确定全量发布此版本吗？';
     }
 
     public function handle()

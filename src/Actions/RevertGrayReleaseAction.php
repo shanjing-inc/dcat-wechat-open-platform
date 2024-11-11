@@ -12,7 +12,7 @@ class RevertGrayReleaseAction extends Action
      * 按钮标题
      * @var string
      */
-    protected $title = '<button class="btn btn-primary">取消灰度</button>';
+    protected $title = '<button class="btn btn-danger">取消灰度</button>';
 
     /**
      * 弹框

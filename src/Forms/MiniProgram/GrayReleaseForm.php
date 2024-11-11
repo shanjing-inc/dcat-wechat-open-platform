@@ -41,9 +41,6 @@ class GrayReleaseForm extends Form implements LazyRenderable
             $whitelist[] = 'support_experiencer_first';
         }
         $this->checkbox('whitelist', '灰度白名单')->options(['support_debuger_first' => '体验成员', 'support_experiencer_first' => '项目成员'])->default($whitelist);
-        if (in_array($plan['status'], [1, 2])) {
-            $this->html(RevertGrayReleaseAction::make()->setKey($authorizer->id));
-        }
     }
 
     public function handle($input)

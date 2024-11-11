@@ -9,6 +9,7 @@ use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
 use Shanjing\DcatWechatOpenPlatform\Actions\GrayReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\ReleaseAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\RevertGrayReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\RollBackAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SpeedupAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\UndoAuditAction;
@@ -34,17 +35,27 @@ class MiniProgramController extends BaseAdminController
                 $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
                 $client     = $authorizer->getMpClient();
 
+                $grayPlan    = $client->getGrayReleasePlan();
+                $grayPlan    = $grayPlan['gray_release_plan'] ?? [];
+                $grayStatus  = $grayPlan['status'] ?? 0;
                 $versionInfo = $client->versionInfo();
                 // 获取最新的审核版本信息
                 $result = $client->getLatestAuditStatus();
+
                 if ($result['errcode'] == 0) {
                     $versionInfo['audit_info'] = $result;
-                    //  TODO 审核版本相关按钮
                     if ($result['status'] == self::AUDIT_STATUS_SUCCESS) {
-                        // 提交发布
-                        $versionInfo['audit_info']['release_btn'] = ReleaseAction::make()->setKey($authorizerId);
-                        // 灰度发布
-                        $versionInfo['audit_info']['gray_release_btn'] = GrayReleaseAction::make()->setKey($authorizerId);
+                        $releaseVersion = $versionInfo['release_info']['release_version'];
+                        $auditVersion   = $versionInfo['audit_info']['user_version'];
+                        // 审核版本与线上版本不一致展示发布按钮
+                        if ($releaseVersion != $auditVersion) {
+                            // 提交发布
+                            $versionInfo['audit_info']['release_btn'] = ReleaseAction::make()->setKey($authorizerId);
+                            // 灰度发布
+                            if ($grayStatus != 1) {
+                                $versionInfo['audit_info']['gray_release_btn'] = GrayReleaseAction::make()->setKey($authorizerId);
+                            }
+                        }
                     } elseif (in_array($result['status'], [self::AUDIT_STATUS_REJECT, self::AUDIT_STATUS_REVOKE])) {
                         // 提交审核
                         $versionInfo['audit_info']['submit_audit_btn'] = '';
@@ -59,8 +70,24 @@ class MiniProgramController extends BaseAdminController
                 if (!empty($versionInfo['release_info'])) {
                     // 正式版小程序码
                     $versionInfo['release_info']['qr_code'] = $authorizer->qrcode_url;
-                    // 回退版本按钮
-                    $versionInfo['release_info']['rollback_btn'] = RollBackAction::make()->setKey($authorizerId);
+                    if ($grayStatus == 1) {
+                        // 展示灰度中相关文案 && 按钮
+                        $versionInfo['release_info']['rollback_btn'] = RevertGrayReleaseAction::make()->setKey($authorizer->id);
+                        $range                                       = [];
+                        if ($grayPlan['support_debuger_first']) {
+                            $range[] = '项目成员';
+                        }
+                        if ($grayPlan['support_experiencer_first']) {
+                            $range[] = '体验成员';
+                        }
+                        $range    = $range ? '；范围：' . implode('、', $range) : '';
+                        $grayText = "（灰度中：{$grayPlan['gray_percentage']}%{$range}）";
+                        $versionInfo['release_info']['release_version'] .= $grayText;
+                        $versionInfo['release_info']['gray_release_btn'] = GrayReleaseAction::make('扩大灰度范围')->setKey($authorizerId);
+                    } else {
+                        // 回退版本按钮
+                        $versionInfo['release_info']['rollback_btn'] = RollBackAction::make()->setKey($authorizerId);
+                    }
                 }
 
                 if (!empty($versionInfo['exp_info'])) {

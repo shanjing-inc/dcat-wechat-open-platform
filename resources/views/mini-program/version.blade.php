@@ -19,6 +19,7 @@
                 <p class="card-text">发布时间：{{ date('Y/m/d H:i:s', $versionInfo['release_info']['release_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['release_info']['release_desc'] }}</p>
                 {!! $versionInfo['release_info']['rollback_btn'] !!}
+                {!! $versionInfo['release_info']['gray_release_btn'] ?? '' !!}
             @endif
         </div>
     </div>
@@ -36,13 +37,13 @@
                 <p class="card-text">版本描述：{{ $versionInfo['audit_info']['user_desc'] }}</p>
                 <p class="card-text">审核状态：@include($bladeNamespace . 'mini-program.audit-status', ['status' => $versionInfo['audit_info']['status']])</p>
                 @if($versionInfo['audit_info']['status'] == 1)
-                    <p class="card-text">驳回原因：{{ $versionInfo['audit_info']['reason'] }}</p>
+                    <p class="card-text">驳回原因：{{ $versionInfo['audit_info']['reason'] ?? '' }}</p>
                 @elseif(in_array($versionInfo['audit_info']['status'], [2, 4]))
                     {!! $versionInfo['audit_info']['speedup_btn'] !!}
                     {!! $versionInfo['audit_info']['undo_btn'] !!}
                 @elseif($versionInfo['audit_info']['status'] == 0)
-                    {!! $versionInfo['audit_info']['release_btn'] !!}
-                    {!! $versionInfo['audit_info']['gray_release_btn'] !!}
+                    {!! $versionInfo['audit_info']['release_btn'] ?? '' !!}
+                    {!! $versionInfo['audit_info']['gray_release_btn'] ?? '' !!}
                 @endif
             @endif
         </div>
