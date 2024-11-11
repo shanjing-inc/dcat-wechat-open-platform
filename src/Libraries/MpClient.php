@@ -108,9 +108,9 @@ class MpClient
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/code-management/grayRelease.html
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function grayRelease()
+    public function grayRelease($params)
     {
-        $response = $this->client->postJson('wxa/grayrelease');
+        $response = $this->client->postJson('wxa/grayrelease', $params);
         return $response->toArray();
     }
 
