@@ -79,6 +79,13 @@ class WechatOpenPlatformAuthorizer extends Model
         self::ACCOUNT_STATUS_19  => '已冻结',
     ];
 
+    public const TRADE_MANAGE_OFF = 0;
+    public const TRADE_MANAGE_ON  = 1;
+    public static $tradeManages   = [
+        self::TRADE_MANAGE_OFF => '关闭',
+        self::TRADE_MANAGE_ON  => '开启',
+    ];
+
     /**
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */

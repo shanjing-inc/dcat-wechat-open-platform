@@ -11,4 +11,8 @@ return [
         'Add wechat open platform authorizer table.',
         '2024_10_31_144105_add_ext_json_to_wechat_open_platform_authorizer_table.php',
     ],
+    '1.0.2' => [
+        'Add column to wechat open platform authorizer table.',
+        '2024_11_12_090330_add_is_trade_managed_to_wechat_open_platform_authorizer_table.php',
+    ],
 ];
