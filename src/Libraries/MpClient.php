@@ -329,4 +329,17 @@ class MpClient
         $response              = $this->client->postJson('cgi-bin/component/setprivacysetting', $params);
         return $response->toArray();
     }
+
+    /**
+     * 获取小程序是否开通发货信息管理服务
+     *
+     * @doc https://developers.weixin.qq.com/miniprogram/dev/platform-capabilities/business-capabilities/order-shipping/order-shipping.html#%E4%B8%83%E3%80%81%E6%9F%A5%E8%AF%A2%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%98%AF%E5%90%A6%E5%B7%B2%E5%BC%80%E9%80%9A%E5%8F%91%E8%B4%A7%E4%BF%A1%E6%81%AF%E7%AE%A1%E7%90%86%E6%9C%8D%E5%8A%A1
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function isTradeManaged($appid)
+    {
+        $response = $this->client->postJson('wxa/sec/order/is_trade_managed', ['appid' => $appid]);
+
+        return $response->toArray();
+    }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\GetTradeManageAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingJumpDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrefetchDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrivacyAction;
@@ -75,6 +76,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                     $actions->append(new SettingJumpDomainAction());
                     $actions->append(new SettingPrefetchDomainAction());
                     $actions->append(new SettingPrivacyAction());
+                    $actions->append(new GetTradeManageAction());
                 }
             });
 
