@@ -73,7 +73,7 @@ HTML;
         $this->textarea('version_desc', '版本说明(version_desc)');
         $this->textarea('feedback_info', '反馈内容(feedback_info)');
         $this->text('order_path', '订单中心 path(order_path)');
-        $this->radio('privacy_api_not_use', '是否不使用“代码中检测出但是未配置的隐私相关接口”')->options([true => '是', false => '否']);
+        $this->radio('privacy_api_not_use', '是否不使用“代码中检测出但是未配置的隐私相关接口”')->options([true => '是', false => '否'])->default(0);
         $this->hidden('categoryOptions')->value(json_encode($categoryOptions));
     }
 
@@ -109,6 +109,17 @@ HTML;
             }
             $params['ugc_declare'] = $declare;
         }
+        if ($input['version_desc']) {
+            $params['version_desc'] = $input['version_desc'];
+        }
+        if ($input['feedback_info']) {
+            $params['feedback_info'] = $input['feedback_info'];
+        }
+        if ($input['order_path']) {
+            $params['order_path'] = $input['order_path'];
+        }
+
+        $params['privacy_api_not_use'] = $input['privacy_api_not_use'] ? true : false;
 
         $client->submitAudit($params);
         return $this->response()->success('提交成功')->refresh();
