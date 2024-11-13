@@ -7,6 +7,7 @@ use Dcat\Admin\Layout\Content;
 use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
+use Shanjing\DcatWechatOpenPlatform\Actions\GetCodePrivacyInfoAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GrayReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\ReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\RevertGrayReleaseAction;
@@ -105,6 +106,7 @@ class MiniProgramController extends BaseAdminController
                             ->button('<button class="btn btn-primary">提交审核</button>');
                         $versionInfo['exp_info']['submit_audit_btn'] = $submitAuditModal;
                     }
+                    $versionInfo['exp_info']['code_privacy_info_btn'] = GetCodePrivacyInfoAction::make()->setKey($authorizer->id);
                 }
 
                 $commitForm  = CommitForm::make()->payload(['authorizerId' => $authorizerId]);
@@ -113,7 +115,7 @@ class MiniProgramController extends BaseAdminController
                     ->centered()
                     ->xl()
                     ->body($commitForm)
-                    ->button('<button class="btn btn-primary pull-left mr-2">提交代码</button>');
+                    ->button('<button class="btn btn-primary">提交代码</button>');
 
                 $tab->add('版本管理', $this->view('mini-program.version', ['commitModalBtn' => $commitModal, 'versionInfo' => $versionInfo]));
                 $row->column(12, $tab->withCard());

@@ -55,6 +55,7 @@
             <hr>
             @if(empty($versionInfo['exp_info']))
                 <p class="card-text">尚未提交体验版</p>
+                {!! $commitModalBtn !!}
             @else
                 <div class="mb-1">
                     <img width="100px" src="{{ $versionInfo['exp_info']['qr_code'] }}" />
@@ -62,9 +63,10 @@
                 <p class="card-text">版本号：{{ $versionInfo['exp_info']['exp_version'] }}</p>
                 <p class="card-text">发布时间：{{ date('Y/m/d H:i:s', $versionInfo['exp_info']['exp_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['exp_info']['exp_desc'] }}</p>
+                {!! $commitModalBtn !!}
                 {!! $versionInfo['exp_info']['submit_audit_btn'] !!}
+                {!! $versionInfo['exp_info']['code_privacy_info_btn'] !!}
             @endif
-            {!! $commitModalBtn !!}
         </div>
     </div>
 </div>
