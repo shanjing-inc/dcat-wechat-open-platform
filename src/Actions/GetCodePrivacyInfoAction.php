@@ -13,7 +13,7 @@ class GetCodePrivacyInfoAction extends RowAction
      * 按钮标题
      * @var string
      */
-    protected $title = '<button class="btn btn-primary btn-outline">隐私接口检测结果</button>';
+    protected $title = '<button class="btn btn-primary">2.执行前置检查</button>';
 
     public function handle()
     {

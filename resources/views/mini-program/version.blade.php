@@ -64,8 +64,8 @@
                 <p class="card-text">发布时间：{{ date('Y/m/d H:i:s', $versionInfo['exp_info']['exp_time']) }}</p>
                 <p class="card-text">版本描述：{{ $versionInfo['exp_info']['exp_desc'] }}</p>
                 {!! $commitModalBtn !!}
-                {!! $versionInfo['exp_info']['submit_audit_btn'] !!}
                 {!! $versionInfo['exp_info']['code_privacy_info_btn'] !!}
+                {!! $versionInfo['exp_info']['submit_audit_btn'] !!}
             @endif
         </div>
     </div>
