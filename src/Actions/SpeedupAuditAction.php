@@ -45,4 +45,11 @@ class SpeedupAuditAction extends Action
 
         return $this->response()->success('加急成功')->refresh();
     }
+
+    public function parameters()
+    {
+        return [
+            'auditId' => $this->auditId,
+        ];
+    }
 }
