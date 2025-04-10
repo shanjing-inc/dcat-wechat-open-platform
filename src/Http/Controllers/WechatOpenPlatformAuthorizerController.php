@@ -5,6 +5,7 @@ namespace Shanjing\DcatWechatOpenPlatform\Http\Controllers;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
+use EasyWeChat\OpenPlatform\Authorization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrefetchDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrivacyAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingServerDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\UpdateAuthInfoAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\UpdateAuthorizerRefreshTokenToolAction;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
 
@@ -82,6 +84,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
 
             $grid->tools(function (Grid\Tools $tools) {
                 $tools->append(new CreateAuthorizerToolAction());
+                $tools->append(new UpdateAuthorizerRefreshTokenToolAction());
             });
 
             $grid->disableCreateButton();
@@ -221,6 +224,18 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
 
         if (!empty($error)) {
             return "授权失败，错误详情：{$error}";
+        }
+        $appId = $info->getAppId();
+        $token = $info->getRefreshToken();
+
+        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $appId)->first();
+        if (empty($authorizer)) {
+            return '未查询到授权记录';
+        }
+
+        if ($token) {
+            $authorizer->refresh_token = $token;
+            $authorizer->save();
         }
 
         return '授权成功';
