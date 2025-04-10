@@ -111,8 +111,12 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             $show->field('principal_name');
             $show->field('refresh_token');
             $show->field('account_status')->using(WechatOpenPlatformAuthorizer::$accountStatuses);
-            $show->field('func_info')->json();
-            $show->field('raw_data')->json();
+            $show->field('func_info')->as(function ($value) {
+                return json_encode($value);
+            });
+            $show->field('raw_data')->as(function ($value) {
+                return json_encode($value);
+            });
             $show->field('created_at');
             $show->field('updated_at');
         });
