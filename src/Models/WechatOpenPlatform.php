@@ -77,22 +77,25 @@ class WechatOpenPlatform extends Model
         $result            = $response->toArray();
         $authorizerInfo    = $result['authorizer_info'];
         $authorizationInfo = $result['authorization_info'];
-        $authorizer        = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
+        $data              = [
+            'username'       => $authorizerInfo['user_name'],
+            'nickname'       => $authorizerInfo['nick_name'],
+            'head_img'       => $authorizerInfo['head_img'],
+            'account_type'   => isset($authorizerInfo['MiniProgramInfo']) ? WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP : WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_OA,
+            'service_type'   => $authorizerInfo['service_type_info']['id'] ?? 0,
+            'verify_type'    => $authorizerInfo['verify_type_info']['id'] ?? 0,
+            'account_status' => $authorizerInfo['account_status'] ?? 0,
+            'qrcode_url'     => $authorizerInfo['qrcode_url'],
+            'principal_name' => $authorizerInfo['principal_name'],
+            'func_info'      => $authorizationInfo['func_info'],
+            'raw_data'       => $result,
+        ];
+        if (!empty($authorizationInfo['authorizer_refresh_token'])) {
+            $data['refresh_token'] = $authorizationInfo['authorizer_refresh_token'];
+        }
+        $authorizer = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
             ['platform_id' => $this->id, 'appid' => $appid],
-            [
-                'username'       => $authorizerInfo['user_name'],
-                'nickname'       => $authorizerInfo['nick_name'],
-                'head_img'       => $authorizerInfo['head_img'],
-                'account_type'   => isset($authorizerInfo['MiniProgramInfo']) ? WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP : WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_OA,
-                'service_type'   => $authorizerInfo['service_type_info']['id'] ?? 0,
-                'verify_type'    => $authorizerInfo['verify_type_info']['id'] ?? 0,
-                'account_status' => $authorizerInfo['account_status'] ?? 0,
-                'qrcode_url'     => $authorizerInfo['qrcode_url'],
-                'principal_name' => $authorizerInfo['principal_name'],
-                'refresh_token'  => $authorizationInfo['authorizer_refresh_token'],
-                'func_info'      => $authorizationInfo['func_info'],
-                'raw_data'       => $result,
-            ]
+
         );
 
         return $authorizer;
@@ -161,6 +164,17 @@ class WechatOpenPlatform extends Model
         $app      = $this->getInstance();
         $api      = $app->getClient();
         $response = $api->get('/sns/component/jscode2session', ['appid' => $appid, 'component_appid' => $this->appid, 'js_code' => $code, 'grant_type' => 'authorization_code']);
+        return $response->toArray();
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getAuthorizerList($offset = 0, $count = 500)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->postJson('/cgi-bin/component/api_get_authorizer_list', ['component_appid' => $this->appid, 'offset' => $offset, 'count' => $count]);
         return $response->toArray();
     }
 

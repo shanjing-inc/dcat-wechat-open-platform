@@ -28,14 +28,17 @@ class MiniProgramController extends BaseAdminController
     public function manage(Content $content, $authorizerId)
     {
         $header = '授权小程序';
+        $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
+        try {
+            $client = $authorizer->getMpClient();
+        } catch (\Throwable $exception) {
+            return $this->view('errors.400', ['exception' => $exception]);
+        }
         return $content->header($header)
             ->breadcrumb('授权管理')
             ->breadcrumb($header)
-            ->body(function (Row $row) use ($authorizerId) {
-                $tab        = new Tab();
-                $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
-                $client     = $authorizer->getMpClient();
-
+            ->body(function (Row $row) use ($authorizerId, $client, $authorizer) {
+                $tab         = new Tab();
                 $grayPlan    = $client->getGrayReleasePlan();
                 $grayPlan    = $grayPlan['gray_release_plan'] ?? [];
                 $grayStatus  = $grayPlan['status'] ?? 0;
