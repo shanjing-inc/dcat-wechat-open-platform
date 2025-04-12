@@ -18,7 +18,8 @@ class OpenPublisherAction extends RowAction
     {
         $id         = $this->getKey();
         $authorizer = WechatOpenPlatformAuthorizer::find($id);
-        $result = $authorizer->platform->canOpenPublisher($authorizer->appid);
+        $client     = $authorizer->getMpClient();
+        $result     = $client->checkCanOpenPublisher();
 
         if (isset($result['errcode']) && $result['errcode'] != 0) {
             return $this->response()->error("检测失败，{$result['errcode']}：{$result['errmsg']}");
