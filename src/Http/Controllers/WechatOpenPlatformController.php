@@ -7,6 +7,7 @@ use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SetShareRatioAction;
 use Shanjing\DcatWechatOpenPlatform\DcatWechatOpenPlatformServiceProvider;
 use Shanjing\DcatWechatOpenPlatform\DcatWechatOpenPlatformServiceProvider as ServiceProvider;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatform;
@@ -39,6 +40,7 @@ class WechatOpenPlatformController extends BaseAdminController
             });
             $grid->actions(function (Grid\Displayers\Actions $actions) {
                 $actions->append(new CreateAuthorizerAction());
+                $actions->append(new SetShareRatioAction(SetShareRatioAction::FROM_PLATFORM));
             });
         });
     }
