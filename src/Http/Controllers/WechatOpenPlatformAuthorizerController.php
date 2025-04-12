@@ -11,6 +11,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetTradeManageAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\OpenPublisherAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\SetShareRatioAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingJumpDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrefetchDomainAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SettingPrivacyAction;
@@ -80,6 +82,8 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                     $actions->append(new SettingPrivacyAction());
                     $actions->append(new GetTradeManageAction());
                 }
+                $actions->append(new SetShareRatioAction(SetShareRatioAction::FROM_AUTHORIZE));
+                $actions->append(new OpenPublisherAction());
             });
 
             $grid->tools(function (Grid\Tools $tools) {

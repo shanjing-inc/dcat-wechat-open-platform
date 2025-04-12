@@ -354,4 +354,28 @@ class MpClient
 
         return $response->toArray();
     }
+
+    /**
+     * 检测是否能开通流量主
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/open/AgencyCheckCanOpenPublisher.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function checkCanOpenPublisher()
+    {
+        $response = $this->client->postJson('/wxa/operationams?action=agency_check_can_open_publisher');
+        return $response->toArray();
+    }
+
+    /**
+     * 开通流量主
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/open/AgencyCreatePublisher.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function openPublisher()
+    {
+        $response = $this->client->postJson('/wxa/operationams?action=agency_create_publisher');
+        return $response->toArray();
+    }
 }

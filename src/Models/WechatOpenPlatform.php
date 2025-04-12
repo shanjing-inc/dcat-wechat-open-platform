@@ -247,6 +247,37 @@ class WechatOpenPlatform extends Model
     }
 
     /**
+     * 获取分成比例
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getShareRatio($appid = null)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $response = $api->postJson('/wxa/getdefaultamsinfo?action=get_share_ratio', ['appid' => $appid ?? $this->appid]);
+        return $response->toArray();
+    }
+
+    /**
+     * 设置分成比例
+     */
+    public function setShareRatio($ratio, $appid = null)
+    {
+        $app      = $this->getInstance();
+        $api      = $app->getClient();
+        $action   = 'set_share_ratio';
+        $params   = ['share_ratio' => $ratio];
+        if ($appid) {
+            $action = 'agency_set_custom_share_ratio';
+
+            $params['appid'] = $appid;
+        }
+
+        $response = $api->postJson("/wxa/setdefaultamsinfo?action={$action}", $params);
+        return $response->toArray();
+    }
+
+    /**
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
     public function templates()
