@@ -36,12 +36,9 @@ class GetAdUnitListForm extends Form implements LazyRenderable
         // 显示小程序信息
         $this->html($this->showAuthorizerInfo($authorizer));
 
-        // 获取并显示广告单元列表
+        // 获取可用的模板ID列表用于表单选择
         try {
-            $adUnits = $this->getAdUnitList($authorizer);
-            $this->html($this->showAdUnitList($adUnits));
-            
-            // 获取可用的模板ID列表用于表单选择
+            $adUnits = $this->getAdUnitList($authorizer, 1, 100, 'SLOT_ID_WEAPP_TEMPLATE', false);
             $tmplOptions = $this->getTmplIdOptions($adUnits);
         } catch (\Throwable $e) {
             Log::error('获取广告单元列表失败', [
@@ -53,6 +50,22 @@ class GetAdUnitListForm extends Form implements LazyRenderable
             $this->disableSubmitButton();
             $tmplOptions = [];
         }
+
+        // 添加模板选择和动态查询功能
+        $this->divider('模板广告单元查询');
+        
+        if (!empty($tmplOptions)) {
+            $this->select('selected_tmpl_id', '选择模板查看绑定详情')
+                ->options(['请选择模板'] + $tmplOptions)
+                ->help('选择模板后将显示该模板绑定的商户广告单元信息')
+                ->attribute('onchange', 'loadTemplateBindList(this.value)');
+        }
+        
+        // 添加动态内容显示区域
+        $this->html('<div id="template-bind-details"></div>');
+        
+        // 添加JavaScript代码
+        $this->html($this->getJavaScriptCode($id));
 
         // 添加创建新广告单元的表单
         $this->divider('创建新广告单元');
@@ -86,6 +99,8 @@ class GetAdUnitListForm extends Form implements LazyRenderable
         if (!$authorizer) {
             return $this->response()->error('未找到授权信息');
         }
+
+        // 移除AJAX请求处理逻辑，现在使用独立的GET接口
 
         // 如果有创建广告单元的请求
         if (!empty($input['name']) && !empty($input['type'])) {
@@ -150,7 +165,7 @@ class GetAdUnitListForm extends Form implements LazyRenderable
     /**
      * 获取广告单元列表
      */
-    protected function getAdUnitList($authorizer, $page = 1, $pageSize = 20, $adSlot = 'SLOT_ID_WEAPP_TEMPLATE')
+    protected function getAdUnitList($authorizer, $page = 1, $pageSize = 20, $adSlot = 'SLOT_ID_WEAPP_TEMPLATE', $returnBindList = true, $tmplId = null)
     {
         try {
             $client = $authorizer->getMpClient();
@@ -159,11 +174,19 @@ class GetAdUnitListForm extends Form implements LazyRenderable
             $params = [
                 'page' => $page,
                 'page_size' => $pageSize,
-                'ad_slot' => $adSlot,
-                'is_return_tmpl_bind_list' => 1  // 返回模板绑定的商户广告单元信息
+                'ad_slot' => $adSlot
             ];
             
+            // 当需要获取某个自定义模板绑定的商户广告单元信息时，需要传递tmpl_id及is_return_tmpl_bind_list参数
+            if ($returnBindList) {
+                $params['is_return_tmpl_bind_list'] = 1;
+                if ($tmplId) {
+                    $params['tmpl_id'] = $tmplId;
+                }
+            }
+            
             $result = $client->getAgencyTmplIdList($params);
+            
             // 获取错误码，支持errcode和ret两种字段
             $errorCode = $result['errcode'] ?? $result['ret'] ?? -1;
             
@@ -300,6 +323,131 @@ class GetAdUnitListForm extends Form implements LazyRenderable
         }
         
         return $options;
+    }
+
+    /**
+     * 显示模板绑定详情
+     */
+    protected function showTemplateBindDetails($adUnits, $tmplId)
+    {
+        $html = '<div class="template-bind-details">';
+        $html .= '<h5>模板 ' . $tmplId . ' 绑定的广告单元</h5>';
+        
+        if (empty($adUnits)) {
+            $html .= '<div class="alert alert-info">该模板暂无绑定的广告单元</div>';
+        } else {
+            $html .= '<div class="table-responsive">';
+            $html .= '<table class="table table-striped table-bordered">';
+            $html .= '<thead><tr>';
+            $html .= '<th>广告单元ID</th>';
+            $html .= '<th>广告单元名称</th>';
+            $html .= '<th>广告位类型</th>';
+            $html .= '<th>状态</th>';
+            $html .= '<th>创建时间</th>';
+            $html .= '</tr></thead><tbody>';
+            
+            foreach ($adUnits as $unit) {
+                $html .= '<tr>';
+                $html .= '<td>' . ($unit['ad_unit_id'] ?? '-') . '</td>';
+                $html .= '<td>' . ($unit['ad_unit_name'] ?? '-') . '</td>';
+                $html .= '<td>' . $this->getAdSlotTypeName($unit['ad_slot'] ?? '') . '</td>';
+                $html .= '<td>' . $this->getStatusText($unit['status'] ?? 0) . '</td>';
+                $html .= '<td>' . ($unit['create_time'] ? date('Y-m-d H:i:s', $unit['create_time']) : '-') . '</td>';
+                $html .= '</tr>';
+                
+                // 如果有模板绑定列表，显示详细信息
+                if (!empty($unit['tmpl_bind_list'])) {
+                    foreach ($unit['tmpl_bind_list'] as $bind) {
+                        $html .= '<tr class="bg-light">';
+                        $html .= '<td colspan="5">';
+                        $html .= '<div class="ml-3">';
+                        $html .= '<strong>绑定详情:</strong> ';
+                        $html .= 'ID: ' . ($bind['ad_unit_id'] ?? '-') . ', ';
+                        $html .= '名称: ' . ($bind['ad_unit_name'] ?? '-') . ', ';
+                        $html .= '类型: ' . $this->getAdSlotTypeName($bind['ad_slot'] ?? '') . ', ';
+                        $html .= '状态: ' . $this->getStatusText($bind['status'] ?? 0);
+                        if (!empty($bind['video_duration'])) {
+                            $html .= ', 视频时长: ' . $bind['video_duration'] . 's';
+                        }
+                        $html .= '</div>';
+                        $html .= '</td>';
+                        $html .= '</tr>';
+                    }
+                }
+            }
+            
+            $html .= '</tbody></table>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        return $html;
+    }
+    
+    /**
+     * 获取状态文本
+     */
+    protected function getStatusText($status)
+    {
+        $statusMap = [
+            0 => '未知',
+            1 => '正常',
+            2 => '暂停',
+            3 => '封禁'
+        ];
+        
+        return $statusMap[$status] ?? '未知';
+    }
+
+    /**
+     * 获取广告位类型名称
+     */
+    protected function getAdSlotTypeName($adSlot)
+    {
+        return self::AD_SLOT_TYPES[$adSlot] ?? $adSlot;
+    }
+
+    /**
+     * 获取JavaScript代码
+     */
+    protected function getJavaScriptCode($authorizerId)
+    {
+        return '
+        <script>
+        function loadTemplateBindList(tmplId) {
+            if (!tmplId || tmplId === "请选择模板") {
+                document.getElementById("template-bind-details").innerHTML = "";
+                return;
+            }
+            
+            // 显示加载状态
+            document.getElementById("template-bind-details").innerHTML = "<div class=\"alert alert-info\">正在加载...</div>";
+            
+            // 构建GET请求URL
+            var apiUrl = "' . admin_url('/wechat/open-platform/mini-program/' . $authorizerId . '/template-bind-list') . '?tmpl_id=" + encodeURIComponent(tmplId);
+            
+            // 发送GET请求
+            fetch(apiUrl, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    document.getElementById("template-bind-details").innerHTML = data.data.html;
+                } else {
+                    document.getElementById("template-bind-details").innerHTML = "<div class=\"alert alert-danger\">" + data.message + "</div>";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("template-bind-details").innerHTML = "<div class=\"alert alert-danger\">请求失败，请重试</div>";
+            });
+        }
+        </script>
+        ';
     }
 
 
