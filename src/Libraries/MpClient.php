@@ -378,4 +378,28 @@ class MpClient
         $response = $this->client->postJson('/wxa/operationams?action=agency_create_publisher');
         return $response->toArray();
     }
+
+    /**
+     * 创建广告单元
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/ad-unit/AgencyCreateAdUnit.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function createAdUnit($params)
+    {
+        $response = $this->client->postJson('/wxa/operationams?action=agency_create_adunit', $params);
+        return $response->toArray();
+    }
+
+    /**
+     * 获取广告单元列表
+     *
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/ad-unit/AgencyGetAdUnitList.html
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getAdUnitList()
+    {
+        $response = $this->client->postJson('/wxa/operationams?action=agency_get_adunit_list');
+        return $response->toArray();
+    }
 }
