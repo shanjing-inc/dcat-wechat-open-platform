@@ -81,10 +81,10 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                     $actions->append(new SettingPrefetchDomainAction());
                     $actions->append(new SettingPrivacyAction());
                     $actions->append(new GetTradeManageAction());
-                    $actions->append(new GetAdUnitListAction());
                 }
                 $actions->append(new SetShareRatioAction(SetShareRatioAction::FROM_AUTHORIZE));
                 $actions->append(new OpenPublisherAction());
+                $actions->append(new GetAdUnitListAction());
             });
 
             $grid->tools(function (Grid\Tools $tools) {

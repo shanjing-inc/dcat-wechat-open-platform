@@ -40,6 +40,9 @@ class GetAdUnitListForm extends Form implements LazyRenderable
         try {
             $adUnits = $this->getAdUnitList($authorizer);
             $this->html($this->showAdUnitList($adUnits));
+            
+            // 获取可用的模板ID列表用于表单选择
+            $tmplOptions = $this->getTmplIdOptions($adUnits);
         } catch (\Throwable $e) {
             Log::error('获取广告单元列表失败', [
                 'authorizer_id' => $id,
@@ -48,6 +51,7 @@ class GetAdUnitListForm extends Form implements LazyRenderable
             $this->html('<div class="alert alert-danger">获取广告单元列表失败：' . $e->getMessage() . '</div>');
             $this->disableResetButton();
             $this->disableSubmitButton();
+            $tmplOptions = [];
         }
 
         // 添加创建新广告单元的表单
@@ -63,7 +67,15 @@ class GetAdUnitListForm extends Form implements LazyRenderable
             ->default('SLOT_ID_WEAPP_TEMPLATE')
             ->help('目前只支持模板广告类型');
 
-        $this->text('tmpl_id', '模板ID');
+        // 如果有可用的模板ID，显示为选择框，否则显示为文本输入框
+        if (!empty($tmplOptions)) {
+            $this->select('tmpl_id', '模板ID')
+                ->options($tmplOptions)
+                ->help('请选择已有的模板ID');
+        } else {
+            $this->text('tmpl_id', '模板ID')
+                ->help('请输入模板ID');
+        }
     }
 
     public function handle($input)
@@ -138,12 +150,20 @@ class GetAdUnitListForm extends Form implements LazyRenderable
     /**
      * 获取广告单元列表
      */
-    protected function getAdUnitList($authorizer)
+    protected function getAdUnitList($authorizer, $page = 1, $pageSize = 20, $adSlot = 'SLOT_ID_WEAPP_TEMPLATE')
     {
         try {
             $client = $authorizer->getMpClient();
-            $result = $client->getAdUnitList();
             
+            // 根据微信开放平台文档构建请求参数
+            $params = [
+                'page' => $page,
+                'page_size' => $pageSize,
+                'ad_slot' => $adSlot,
+                'is_return_tmpl_bind_list' => 1  // 返回模板绑定的商户广告单元信息
+            ];
+            
+            $result = $client->getAgencyTmplIdList($params);
             // 获取错误码，支持errcode和ret两种字段
             $errorCode = $result['errcode'] ?? $result['ret'] ?? -1;
             
@@ -154,7 +174,8 @@ class GetAdUnitListForm extends Form implements LazyRenderable
                 Log::error('获取广告单元列表失败', [
                     'errcode' => $errorCode,
                     'errmsg' => $result['errmsg'] ?? $result['msg'] ?? '',
-                    'error_message' => $errorMsg
+                    'error_message' => $errorMsg,
+                    'params' => $params
                 ]);
                 throw new \Exception($errorMsg);
             }
@@ -194,11 +215,11 @@ class GetAdUnitListForm extends Form implements LazyRenderable
         }
 
         $html = '<div class="alert alert-success">';
-        $html .= '<h5>现有广告单元列表</h5>';
+        $html .= '<h5>原生模板广告自定义模板列表（最多显示20条）</h5>';
         $html .= '<div class="table-responsive">';
         $html .= '<table class="table table-sm table-striped">';
         $html .= '<thead class="thead-light">';
-        $html .= '<tr><th>模板ID</th><th>广告单元名称</th><th>广告位类型</th><th>绑定数量</th></tr>';
+        $html .= '<tr><th>模板ID</th><th>模板名称</th><th>广告位类型</th><th>绑定数量</th><th>操作</th></tr>';
         $html .= '</thead><tbody>';
         
         foreach ($adUnits as $unit) {
@@ -206,17 +227,79 @@ class GetAdUnitListForm extends Form implements LazyRenderable
             $name = $unit['ad_unit_name'] ?? '-';
             $slotId = $unit['slot_id'] ?? '-';
             $bindCount = $unit['tmpl_bind_total_num'] ?? 0;
+            $tmplBindList = $unit['tmpl_bind_list'] ?? [];
             
             $html .= "<tr>";
             $html .= "<td><code>{$tmplId}</code></td>";
             $html .= "<td>{$name}</td>";
             $html .= "<td><span class='badge badge-info'>{$slotId}</span></td>";
             $html .= "<td><span class='badge badge-secondary'>{$bindCount}</span></td>";
+            $html .= "<td>";
+            if (!empty($tmplBindList)) {
+                $html .= "<button class='btn btn-sm btn-outline-primary' type='button' data-toggle='collapse' data-target='#bind-list-{$tmplId}' aria-expanded='false'>查看绑定详情</button>";
+            } else {
+                $html .= "<span class='text-muted'>无绑定</span>";
+            }
+            $html .= "</td>";
             $html .= "</tr>";
+            
+            // 如果有绑定列表，显示详细信息
+            if (!empty($tmplBindList)) {
+                $html .= "<tr>";
+                $html .= "<td colspan='5'>";
+                $html .= "<div class='collapse' id='bind-list-{$tmplId}'>";
+                $html .= "<div class='card card-body mt-2'>";
+                $html .= "<h6 class='mb-3'>模板绑定的广告单元列表</h6>";
+                $html .= "<div class='table-responsive'>";
+                $html .= "<table class='table table-sm table-bordered'>";
+                $html .= "<thead class='thead-dark'>";
+                $html .= "<tr><th>广告单元ID</th><th>广告单元名称</th><th>状态</th></tr>";
+                $html .= "</thead><tbody>";
+                
+                foreach ($tmplBindList as $bindUnit) {
+                    $adUnitId = $bindUnit['ad_unit_id'] ?? '-';
+                    $adUnitName = $bindUnit['ad_unit_name'] ?? '-';
+                    $status = $bindUnit['ad_unit_status'] ?? 0;
+                    $statusText = $status == 1 ? '开启' : '关闭';
+                    $statusClass = $status == 1 ? 'badge-success' : 'badge-danger';
+                    
+                    $html .= "<tr>";
+                    $html .= "<td><code>{$adUnitId}</code></td>";
+                    $html .= "<td>{$adUnitName}</td>";
+                    $html .= "<td><span class='badge {$statusClass}'>{$statusText}</span></td>";
+                    $html .= "</tr>";
+                }
+                
+                $html .= "</tbody></table>";
+                $html .= "</div>";
+                $html .= "</div>";
+                $html .= "</div>";
+                $html .= "</td>";
+                $html .= "</tr>";
+            }
         }
         
         $html .= '</tbody></table></div></div>';
         return $html;
+    }
+
+    /**
+     * 从广告单元列表中提取模板ID选项
+     */
+    protected function getTmplIdOptions($adUnits)
+    {
+        $options = [];
+        
+        foreach ($adUnits as $unit) {
+            $tmplId = $unit['tmpl_id'] ?? '';
+            $name = $unit['ad_unit_name'] ?? '';
+            
+            if (!empty($tmplId) && $tmplId !== '-') {
+                $options[$tmplId] = $tmplId . ($name ? " ({$name})" : '');
+            }
+        }
+        
+        return $options;
     }
 
 

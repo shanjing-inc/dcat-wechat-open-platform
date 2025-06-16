@@ -4,6 +4,8 @@ namespace Shanjing\DcatWechatOpenPlatform\Libraries;
 
 use EasyWeChat\MiniApp\Application;
 
+use function Pest\Laravel\json;
+
 class MpClient
 {
     /**
@@ -392,14 +394,20 @@ class MpClient
     }
 
     /**
-     * 获取广告单元列表
+     * 获取原生模板广告自定义模板绑定情况
      *
-     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/ad-unit/AgencyGetAdUnitList.html
+     * @param array $params 请求参数
+     *   - page: 返回第几页数据
+     *   - page_size: 当页返回数据条数
+     *   - ad_slot: 广告位类型名称
+     *   - tmpl_id: 模板广告单元ID（可选）
+     *   - is_return_tmpl_bind_list: 是否返回该模板广告单元ID绑定的商户广告单元信息（可选）
+     * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/ad-mgnt/GetAgencyTmplIdList.html
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function getAdUnitList()
+    public function getAgencyTmplIdList($params)
     {
-        $response = $this->client->postJson('/wxa/operationams?action=agency_get_adunit_list');
+        $response = $this->client->postJson('/wxa/operationams?action=agency_get_tmpl_id_list', $params);
         return $response->toArray();
     }
 }
