@@ -5,11 +5,11 @@ namespace Shanjing\DcatWechatOpenPlatform\Http\Controllers;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
-use EasyWeChat\OpenPlatform\Authorization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\GetAdUnitListAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetTradeManageAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\OpenPublisherAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\SetShareRatioAction;
@@ -81,6 +81,7 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                     $actions->append(new SettingPrefetchDomainAction());
                     $actions->append(new SettingPrivacyAction());
                     $actions->append(new GetTradeManageAction());
+                    $actions->append(new GetAdUnitListAction());
                 }
                 $actions->append(new SetShareRatioAction(SetShareRatioAction::FROM_AUTHORIZE));
                 $actions->append(new OpenPublisherAction());
