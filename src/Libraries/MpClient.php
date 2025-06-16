@@ -407,7 +407,29 @@ class MpClient
      */
     public function getAgencyTmplIdList($params)
     {
-        $response = $this->client->postJson('/wxa/operationams?action=agency_get_tmpl_id_list', $params);
-        return $response->toArray();
+        $response = $this->client->postJson('/wxa/operationams?action=get_agency_ad_unit_list', $params);
+        $result   = $response->toArray();
+
+        $errorMessages = [
+            0 => 'ok',
+            -202 => '内部错误，可在一段时间后重试',
+            1700 => '参数错误，请检验输入参数是否符合文档说明',
+            1701 => '参数错误，请检验输入参数是否符合文档说明',
+            1735 => '商户未完成协议签署流程，请完成签约操作',
+            1737 => '操作过快，请等待一分钟后重新操作',
+            1807 => '无效流量主，请通过开通流量主接口为该appid开通流量主',
+            2009 => '无效流量主，请通过开通流量主接口为该appid开通流量主',
+            2056 => '服务商未在变现专区开通账户，请在第三方平台页面的变现专区开通服务'
+        ];
+        
+        $errmsg  = $result['err_msg'] ?? $result['errmsg'] ?? '';
+        $errcode = $result['errcode'] ?? $result['ret'] ?? -1;
+        $message = $errorMessages[$errcode] ?? $errmsg;
+        $message = $message ?: "未知错误（错误码：{$errcode}）";
+
+        $result['errcode'] = $errcode;
+        $result['errmsg']  = $message;
+
+        return $result;
     }
 }

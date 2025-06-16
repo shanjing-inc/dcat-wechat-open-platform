@@ -7,6 +7,7 @@ use Dcat\Admin\Layout\Content;
 use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Widgets\Modal;
 use Dcat\Admin\Widgets\Tab;
+use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetCodePrivacyInfoAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GrayReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\ReleaseAction;
@@ -143,5 +144,216 @@ class MiniProgramController extends BaseAdminController
         // 中止后续逻辑（默认逻辑）
         return false;
 JS;
+    }
+
+    /**
+     * 获取模板绑定列表
+     */
+    public function getTemplateBindList($authorizerId)
+    {
+        try {
+            $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
+            if (!$authorizer) {
+                return response()->json([
+                    'status' => false,
+                    'message' => '授权方不存在'
+                ]);
+            }
+
+            $client = $authorizer->getMpClient();
+            $tmplId = request('tmpl_id');
+            
+            if (!$tmplId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => '模板ID不能为空'
+                ]);
+            }
+
+            // 调用微信接口获取模板绑定的广告单元列表
+            $params = [
+                'ad_unit_id' => $tmplId,
+                'is_return_tmpl_bind_list' => 1,
+                'limit' => 20,
+                'offset' => 0
+            ];
+            
+            $result = $client->getAgencyTmplIdList($params);
+
+            $errorCode = $result['errcode'] ?? $result['ret'] ?? -1;
+            if ($errorCode != 0) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $result['errmsg'] ?? '获取数据失败'
+                ]);
+            }
+
+            // 生成HTML
+            $html = $this->generateTemplateBindHtml($result['ad_unit_list'] ?? [], $tmplId);
+            
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'html' => $html,
+                    'total' => $result['total_num'] ?? 0
+                ]
+            ]);
+            
+        } catch (\Throwable $exception) {
+            Log::error('获取模板绑定列表失败: ' . $exception->getMessage(), [
+                'authorizerId' => $authorizerId,
+                'tmplId' => request('tmpl_id'),
+                'trace' => $exception->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'status' => false,
+                'message' => '系统错误，请重试'
+            ]);
+        }
+    }
+
+    /**
+     * 生成模板绑定详情HTML
+     */
+    private function generateTemplateBindHtml($adUnitList, $tmplId)
+    {
+        if (empty($adUnitList)) {
+            return '<div class="alert alert-info">该模板暂无绑定的广告单元</div>';
+        }
+
+        $html = '<div class="template-bind-container">';
+        
+        foreach ($adUnitList as $template) {
+            $templateId = $template['tmpl_id'] ?? '';
+            $templateName = $template['ad_unit_name'] ?? '未命名模板';
+            $templateText = $template['tmpl_text'] ?? '';
+            $slotId = $template['slot_id'] ?? '';
+            $bindList = $template['tmpl_bind_list'] ?? [];
+            $bindTotal = $template['tmpl_bind_total_num'] ?? 0;
+            
+            $html .= '<div class="template-item mb-4">';
+            $html .= '<div class="card">';
+            $html .= '<div class="card-header">';
+            $html .= '<h5 class="mb-0">';
+            $html .= '<i class="fa fa-template"></i> 模板ID: ' . htmlspecialchars($templateId);
+            if ($templateName) {
+                $html .= ' - ' . htmlspecialchars($templateName);
+            }
+            $html .= '<span class="badge badge-info ml-2">绑定数量: ' . $bindTotal . '</span>';
+            $html .= '</h5>';
+            if ($templateText) {
+                $html .= '<p class="text-muted mb-0">模板描述: ' . htmlspecialchars($templateText) . '</p>';
+            }
+            if ($slotId) {
+                $html .= '<p class="text-muted mb-0">广告位ID: ' . htmlspecialchars($slotId) . '</p>';
+            }
+            $html .= '</div>';
+            
+            if (!empty($bindList)) {
+                $html .= '<div class="card-body">';
+                $html .= '<div class="table-responsive">';
+                $html .= '<table class="table table-striped table-bordered mb-0">';
+                $html .= '<thead class="thead-light"><tr>';
+                $html .= '<th>广告单元ID</th>';
+                $html .= '<th>广告单元名称</th>';
+                $html .= '<th>尺寸</th>';
+                $html .= '<th>状态</th>';
+                $html .= '</tr></thead>';
+                $html .= '<tbody>';
+                
+                foreach ($bindList as $adUnit) {
+                    $html .= '<tr>';
+                    $html .= '<td><code>' . htmlspecialchars($adUnit['ad_unit_id'] ?? '') . '</code></td>';
+                    $html .= '<td>' . htmlspecialchars($adUnit['ad_unit_name'] ?? '未命名') . '</td>';
+                    
+                    // 处理广告单元尺寸
+                    $sizeText = '';
+                    if (!empty($adUnit['ad_unit_size'])) {
+                        $sizes = [];
+                        foreach ($adUnit['ad_unit_size'] as $size) {
+                            $width = $size['width'] ?? 0;
+                            $height = $size['height'] ?? 0;
+                            if ($width && $height) {
+                                $sizes[] = $width . 'x' . $height;
+                            }
+                        }
+                        $sizeText = implode(', ', $sizes);
+                    }
+                    $html .= '<td>' . ($sizeText ?: '-') . '</td>';
+                    
+                    $html .= '<td>' . $this->getAdUnitStatusText($adUnit['ad_unit_status'] ?? 0) . '</td>';
+                    $html .= '</tr>';
+                }
+                
+                $html .= '</tbody></table></div></div>';
+            } else {
+                $html .= '<div class="card-body">';
+                $html .= '<div class="alert alert-warning mb-0">该模板暂无绑定的广告单元</div>';
+                $html .= '</div>';
+            }
+            
+            $html .= '</div></div>';
+        }
+        
+        $html .= '</div>';
+        
+        return $html;
+    }
+
+    /**
+     * 获取广告位类型名称
+     */
+    private function getAdSlotTypeName($type)
+    {
+        $types = [
+            1 => 'Banner广告',
+            2 => '激励式视频广告', 
+            3 => '插屏广告',
+            4 => '视频广告',
+            5 => '视频贴片广告',
+            6 => '格子广告'
+        ];
+        
+        return $types[$type] ?? '未知类型';
+    }
+
+    /**
+     * 获取广告单元类型名称
+     */
+    private function getAdUnitTypeName($type)
+    {
+        $types = [
+            'AD_UNIT_TYPE_TEMPLATE_CUSTOM' => '<span class="badge badge-primary">自定义模板</span>',
+            'AD_UNIT_TYPE_TEMPLATE_SYSTEM' => '<span class="badge badge-info">系统模板</span>',
+            'AD_UNIT_TYPE_BANNER' => '<span class="badge badge-secondary">Banner广告</span>',
+            'AD_UNIT_TYPE_VIDEO' => '<span class="badge badge-warning">视频广告</span>',
+            'AD_UNIT_TYPE_INTERSTITIAL' => '<span class="badge badge-dark">插屏广告</span>'
+        ];
+        
+        return $types[$type] ?? '<span class="badge badge-light">' . htmlspecialchars($type) . '</span>';
+    }
+
+    /**
+     * 获取广告单元状态文本
+     */
+    private function getAdUnitStatusText($status)
+    {
+        $statusMap = [
+            0 => '<span class="badge badge-secondary">已暂停</span>',
+            1 => '<span class="badge badge-success">已启用</span>',
+            2 => '<span class="badge badge-warning">审核中</span>',
+            3 => '<span class="badge badge-danger">审核失败</span>'
+        ];
+        
+        return $statusMap[$status] ?? '<span class="badge badge-secondary">未知(' . $status . ')</span>';
+    }
+
+    /**
+     * 获取状态文本（保留向后兼容）
+     */
+    private function getStatusText($status)
+    {
+        return $this->getAdUnitStatusText($status);
     }
 }
