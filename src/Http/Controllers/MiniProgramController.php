@@ -174,8 +174,9 @@ JS;
             $params = [
                 'ad_unit_id' => $tmplId,
                 'is_return_tmpl_bind_list' => 1,
-                'limit' => 20,
-                'offset' => 0
+                'page' => 1,
+                'page_size' => 100,
+                'ad_slot' => 'SLOT_ID_WEAPP_TEMPLATE'
             ];
             
             $result = $client->getAgencyTmplIdList($params);
@@ -228,7 +229,6 @@ JS;
             $templateId = $template['tmpl_id'] ?? '';
             $templateName = $template['ad_unit_name'] ?? '未命名模板';
             $templateText = $template['tmpl_text'] ?? '';
-            $slotId = $template['slot_id'] ?? '';
             $bindList = $template['tmpl_bind_list'] ?? [];
             $bindTotal = $template['tmpl_bind_total_num'] ?? 0;
             
@@ -244,9 +244,6 @@ JS;
             $html .= '</h5>';
             if ($templateText) {
                 $html .= '<p class="text-muted mb-0">模板描述: ' . htmlspecialchars($templateText) . '</p>';
-            }
-            if ($slotId) {
-                $html .= '<p class="text-muted mb-0">广告位ID: ' . htmlspecialchars($slotId) . '</p>';
             }
             $html .= '</div>';
             
