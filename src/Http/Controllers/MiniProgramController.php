@@ -172,7 +172,7 @@ JS;
 
             // 调用微信接口获取模板绑定的广告单元列表
             $params = [
-                'ad_unit_id' => $tmplId,
+                'tmpl_id' => $tmplId,
                 'is_return_tmpl_bind_list' => 1,
                 'page' => 1,
                 'page_size' => 100,
@@ -299,58 +299,15 @@ JS;
     }
 
     /**
-     * 获取广告位类型名称
-     */
-    private function getAdSlotTypeName($type)
-    {
-        $types = [
-            1 => 'Banner广告',
-            2 => '激励式视频广告', 
-            3 => '插屏广告',
-            4 => '视频广告',
-            5 => '视频贴片广告',
-            6 => '格子广告'
-        ];
-        
-        return $types[$type] ?? '未知类型';
-    }
-
-    /**
-     * 获取广告单元类型名称
-     */
-    private function getAdUnitTypeName($type)
-    {
-        $types = [
-            'AD_UNIT_TYPE_TEMPLATE_CUSTOM' => '<span class="badge badge-primary">自定义模板</span>',
-            'AD_UNIT_TYPE_TEMPLATE_SYSTEM' => '<span class="badge badge-info">系统模板</span>',
-            'AD_UNIT_TYPE_BANNER' => '<span class="badge badge-secondary">Banner广告</span>',
-            'AD_UNIT_TYPE_VIDEO' => '<span class="badge badge-warning">视频广告</span>',
-            'AD_UNIT_TYPE_INTERSTITIAL' => '<span class="badge badge-dark">插屏广告</span>'
-        ];
-        
-        return $types[$type] ?? '<span class="badge badge-light">' . htmlspecialchars($type) . '</span>';
-    }
-
-    /**
      * 获取广告单元状态文本
      */
     private function getAdUnitStatusText($status)
     {
         $statusMap = [
-            0 => '<span class="badge badge-secondary">已暂停</span>',
-            1 => '<span class="badge badge-success">已启用</span>',
-            2 => '<span class="badge badge-warning">审核中</span>',
-            3 => '<span class="badge badge-danger">审核失败</span>'
+            1 => '<span class="badge badge-success">开启</span>',
+            2 => '<span class="badge badge-danger">关闭</span>',
         ];
         
         return $statusMap[$status] ?? '<span class="badge badge-secondary">未知(' . $status . ')</span>';
-    }
-
-    /**
-     * 获取状态文本（保留向后兼容）
-     */
-    private function getStatusText($status)
-    {
-        return $this->getAdUnitStatusText($status);
     }
 }
