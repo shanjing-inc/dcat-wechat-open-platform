@@ -405,11 +405,10 @@ class MpClient
      * @doc https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/ams/ad-mgnt/GetAgencyTmplIdList.html
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      */
-    public function getAgencyTmplIdList($params)
+    public function getAgencyTmplIdList($params, $action = 'get_agency_ad_unit_list')
     {
-        $response = $this->client->postJson('/wxa/operationams?action=get_agency_ad_unit_list', $params);
+        $response = $this->client->postJson("/wxa/operationams?action={$action}", $params);
         $result   = $response->toArray();
-
         $errorMessages = [
             0 => 'ok',
             -202 => '内部错误，可在一段时间后重试',
@@ -421,7 +420,7 @@ class MpClient
             2009 => '无效流量主，请通过开通流量主接口为该appid开通流量主',
             2056 => '服务商未在变现专区开通账户，请在第三方平台页面的变现专区开通服务'
         ];
-        
+
         $errmsg  = $result['err_msg'] ?? $result['errmsg'] ?? '';
         $errcode = $result['errcode'] ?? $result['ret'] ?? -1;
         $message = $errorMessages[$errcode] ?? $errmsg;
@@ -431,5 +430,13 @@ class MpClient
         $result['errmsg']  = $message;
 
         return $result;
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function getAdunitList($params)
+    {
+        return $this->getAgencyTmplIdList($params, 'agency_get_adunit_list');
     }
 }
