@@ -95,7 +95,7 @@ class WechatOpenPlatform extends Model
         }
         $authorizer = WechatOpenPlatformAuthorizer::where('appid', $appid)->updateOrCreate(
             ['platform_id' => $this->id, 'appid' => $appid],
-
+            $data
         );
 
         return $authorizer;
