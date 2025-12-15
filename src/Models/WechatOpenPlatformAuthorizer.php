@@ -98,9 +98,13 @@ class WechatOpenPlatformAuthorizer extends Model
      * @author Hailong Tian <tianhailong@shanjing-inc.com>
      * @return \EasyWeChat\OfficialAccount\Application|\EasyWeChat\MiniApp\Application
      */
-    public function getAuthorizationInstance($config = [])
+    public function getAuthorizationInstance($config = [], $rebuild = false)
     {
         $key  = "WechatOpenPlatformAuthorizer:{$this->id}";
+        // 兼容队列中 easywechat 的授权 access_token 失效问题
+        if ($rebuild) {
+            app()->forgetInstance($key);
+        }
         $that = $this;
         app()->singletonIf($key, function () use ($that, $config) {
             $platform = $that->platform;
