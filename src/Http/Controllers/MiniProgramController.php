@@ -18,6 +18,7 @@ use Shanjing\DcatWechatOpenPlatform\Actions\UndoAuditAction;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\CommitForm;
 use Shanjing\DcatWechatOpenPlatform\Forms\MiniProgram\SubmitAuditForm;
 use Shanjing\DcatWechatOpenPlatform\Models\WechatOpenPlatformAuthorizer;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class MiniProgramController extends BaseAdminController
 {
@@ -162,7 +163,7 @@ JS;
 
             $client = $authorizer->getMpClient();
             $tmplId = request('tmpl_id');
-            
+
             if (!$tmplId) {
                 return response()->json([
                     'status' => false,
@@ -178,7 +179,7 @@ JS;
                 'page_size' => 100,
                 'ad_slot' => 'SLOT_ID_WEAPP_TEMPLATE'
             ];
-            
+
             $result = $client->getAgencyTmplIdList($params);
 
             $errorCode = $result['errcode'] ?? $result['ret'] ?? -1;
@@ -191,7 +192,7 @@ JS;
 
             // 生成HTML
             $html = $this->generateTemplateBindHtml($result['ad_unit_list'] ?? [], $tmplId);
-            
+
             return response()->json([
                 'status' => true,
                 'data' => [
@@ -199,17 +200,54 @@ JS;
                     'total' => $result['total_num'] ?? 0
                 ]
             ]);
-            
+
         } catch (\Throwable $exception) {
             Log::error('获取模板绑定列表失败: ' . $exception->getMessage(), [
                 'authorizerId' => $authorizerId,
                 'tmplId' => request('tmpl_id'),
                 'trace' => $exception->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'status' => false,
                 'message' => '系统错误，请重试'
+            ]);
+        }
+    }
+
+    public function getCategoryOptions($authorizerId)
+    {
+        try {
+            $authorizer = WechatOpenPlatformAuthorizer::find($authorizerId);
+            if (!$authorizer) {
+                return response()->json([
+                    'status' => false,
+                    'message' => '授权方不存在'
+                ]);
+            }
+
+            $client = $authorizer->getMpClient();
+            $categoryList = $client->getCategoryList()['category_list'] ?? [];
+            $categoryOptions = [];
+            foreach ($categoryList as $category) {
+                $key  = $category['first_id'] . '-' . $category['second_id'];
+                $name = $category['first_class'] . '-' . $category['second_class'];
+                if (!empty($category['third_class'])) {
+                    $key .= '-' . $category['third_id'];
+                    $name .= '-' . $category['third_class'];
+                }
+                $categoryOptions[$key] = $name;
+            }
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'options' => $categoryOptions
+                ]
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => '获取类目列表失败: ' . $exception->getMessage()
             ]);
         }
     }
@@ -224,14 +262,14 @@ JS;
         }
 
         $html = '<div class="template-bind-container">';
-        
+
         foreach ($adUnitList as $template) {
             $templateId = $template['tmpl_id'] ?? '';
             $templateName = $template['ad_unit_name'] ?? '未命名模板';
             $templateText = $template['tmpl_text'] ?? '';
             $bindList = $template['tmpl_bind_list'] ?? [];
             $bindTotal = $template['tmpl_bind_total_num'] ?? 0;
-            
+
             $html .= '<div class="template-item mb-4">';
             $html .= '<div class="card">';
             $html .= '<div class="card-header">';
@@ -246,7 +284,7 @@ JS;
                 $html .= '<p class="text-muted mb-0">模板描述: ' . htmlspecialchars($templateText) . '</p>';
             }
             $html .= '</div>';
-            
+
             if (!empty($bindList)) {
                 $html .= '<div class="card-body">';
                 $html .= '<div class="table-responsive">';
@@ -258,12 +296,12 @@ JS;
                 $html .= '<th>状态</th>';
                 $html .= '</tr></thead>';
                 $html .= '<tbody>';
-                
+
                 foreach ($bindList as $adUnit) {
                     $html .= '<tr>';
                     $html .= '<td><code>' . htmlspecialchars($adUnit['ad_unit_id'] ?? '') . '</code></td>';
                     $html .= '<td>' . htmlspecialchars($adUnit['ad_unit_name'] ?? '未命名') . '</td>';
-                    
+
                     // 处理广告单元尺寸
                     $sizeText = '';
                     if (!empty($adUnit['ad_unit_size'])) {
@@ -278,23 +316,23 @@ JS;
                         $sizeText = implode(', ', $sizes);
                     }
                     $html .= '<td>' . ($sizeText ?: '-') . '</td>';
-                    
+
                     $html .= '<td>' . $this->getAdUnitStatusText($adUnit['ad_unit_status'] ?? 0) . '</td>';
                     $html .= '</tr>';
                 }
-                
+
                 $html .= '</tbody></table></div></div>';
             } else {
                 $html .= '<div class="card-body">';
                 $html .= '<div class="alert alert-warning mb-0">该模板暂无绑定的广告单元</div>';
                 $html .= '</div>';
             }
-            
+
             $html .= '</div></div>';
         }
-        
+
         $html .= '</div>';
-        
+
         return $html;
     }
 
@@ -307,7 +345,7 @@ JS;
             1 => '<span class="badge badge-success">开启</span>',
             2 => '<span class="badge badge-danger">关闭</span>',
         ];
-        
+
         return $statusMap[$status] ?? '<span class="badge badge-secondary">未知(' . $status . ')</span>';
     }
 }

@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchPreCheckAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchCommitCodeToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchSubmitAuditToolAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetAdUnitListAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetTradeManageAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\OpenPublisherAction;
@@ -90,8 +93,13 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             $grid->tools(function (Grid\Tools $tools) {
                 $tools->append(new CreateAuthorizerToolAction());
                 $tools->append(new UpdateAuthorizerRefreshTokenToolAction());
+                $tools->append(new BatchCommitCodeToolAction());
+                $tools->append(new BatchPreCheckAction());
+                $tools->append(new BatchSubmitAuditToolAction());
             });
 
+            $grid->disableBatchActions();
+            $grid->showRowSelector();
             $grid->disableCreateButton();
         });
     }
