@@ -26,13 +26,33 @@ class BatchCommitCodeForm extends Form implements LazyRenderable
         $this->hidden('keys')->attribute('id', 'batch_commit_keys');
         $this->select('template_id', '模板')->options($options)->required();
         $this->text('user_version', '版本号')->required();
-        $this->text('user_desc', '版本描述')->required();
+        $this->textarea('user_desc', '版本描述')->required();
+
+        // 准备模板数据用于 JS
+        $templateData = [];
+        foreach ($templates as $template) {
+            $templateData[$template->template_id] = [
+                'user_version' => $template->user_version,
+                'user_desc'    => $template->user_desc,
+            ];
+        }
+        $templateJson = json_encode($templateData);
 
         Admin::script(
             <<<JS
             if (window.__batch_commit_keys) {
                 $('#batch_commit_keys').val(window.__batch_commit_keys);
             }
+
+            // 模板选择变更时自动填充版本号和描述
+            var templateData = {$templateJson};
+            $('select[name="template_id"]').on('change', function() {
+                var templateId = $(this).val();
+                if (templateId && templateData[templateId]) {
+                    $('input[name="user_version"]').val(templateData[templateId].user_version);
+                    $('textarea[name="user_desc"]').val(templateData[templateId].user_desc);
+                }
+            });
 JS
         );
     }
@@ -81,6 +101,8 @@ JS
                     $errors[] = "ID {$authorizer->id}: " . ($result['errmsg'] ?? '提交失败');
                     continue;
                 }
+
+                $authorizer->updateVersionInfo();
                 $successCount++;
             } catch (\Throwable $exception) {
                 $failedCount++;

@@ -169,6 +169,7 @@ JS
             try {
                 $client = $authorizer->getMpClient();
                 $client->submitAudit($params);
+                $authorizer->updateVersionInfo();
                 $successCount++;
             } catch (\Throwable $exception) {
                 $failedCount++;
