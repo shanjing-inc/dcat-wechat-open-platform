@@ -36,6 +36,7 @@ class MiniProgramController extends BaseAdminController
         } catch (\Throwable $exception) {
             return $this->view('errors.400', ['exception' => $exception]);
         }
+        $authorizer->updateVersionInfo();
         return $content->header($header)
             ->breadcrumb('授权管理')
             ->breadcrumb($header)
@@ -44,9 +45,9 @@ class MiniProgramController extends BaseAdminController
                 $grayPlan    = $client->getGrayReleasePlan();
                 $grayPlan    = $grayPlan['gray_release_plan'] ?? [];
                 $grayStatus  = $grayPlan['status'] ?? 0;
-                $versionInfo = $client->versionInfo();
+                $versionInfo = $authorizer->version_info['base_info'] ?? [];
                 // 获取最新的审核版本信息
-                $result = $client->getLatestAuditStatus();
+                $result = $authorizer->version_info['audit_info'] ?? [];
 
                 if ($result['errcode'] == 0) {
                     $versionInfo['audit_info'] = $result;

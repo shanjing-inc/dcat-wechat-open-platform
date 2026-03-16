@@ -18,8 +18,9 @@ class WechatOpenPlatformAuthorizer extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'func_info' => 'array',
-        'raw_data'  => 'array',
+        'func_info'    => 'array',
+        'raw_data'     => 'array',
+        'version_info' => 'array',
     ];
 
     public const ACCOUNT_TYPE_OA = 1;
@@ -140,5 +141,23 @@ class WechatOpenPlatformAuthorizer extends Model
             throw new NotFoundHttpException('未查询到授权平台：' . $appid);
         }
         return $authorizer->getAuthorizationInstance();
+    }
+
+    /**
+     * @author Hailong Tian <tianhailong@shanjing-inc.com>
+     */
+    public function updateVersionInfo()
+    {
+        $client    = $this->getMpClient();
+        $baseInfo  = $client->versionInfo();
+        $auditInfo = $client->getLatestAuditStatus();
+        
+        $payload = [
+            'base_info'  => $baseInfo,
+            'audit_info' => $auditInfo
+        ];
+
+        $this->version_info = $payload;
+        $this->save();
     }
 }

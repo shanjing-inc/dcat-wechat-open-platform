@@ -8,10 +8,13 @@ use Dcat\Admin\Show;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchRollBackAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\CreateAuthorizerToolAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\BatchPreCheckAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchReleaseAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\BatchCommitCodeToolAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\BatchSubmitAuditToolAction;
+use Shanjing\DcatWechatOpenPlatform\Actions\BatchUpdateVersionInfoAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetAdUnitListAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\GetTradeManageAction;
 use Shanjing\DcatWechatOpenPlatform\Actions\OpenPublisherAction;
@@ -48,6 +51,35 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
             $grid->column('platform_id');
             $grid->column('nickname');
             $grid->column('appid');
+            $grid->column('version_info', '版本信息')->display(function () {
+                if ($this->account_type != WechatOpenPlatformAuthorizer::ACCOUNT_TYPE_MP) {
+                    return '-';
+                }
+                $releaseVersion = data_get($this->version_info, 'base_info.release_info.release_version', '-');
+                $expVersion     = data_get($this->version_info, 'base_info.exp_info.exp_version', '-');
+                $auditVersion   = data_get($this->version_info, 'audit_info.user_version');
+                $auditStatus    = data_get($this->version_info, 'audit_info.status');
+
+                $lines = [
+                    '体验版本：' . $expVersion,
+                    '正式版本：' . $releaseVersion,
+                ];
+
+                if ($auditVersion) {
+                    $auditMap = [
+                        0 => '通过',
+                        1 => '失败',
+                        2 => '审核中',
+                        3 => '已撤回',
+                        4 => '延后',
+                    ];
+                    $auditText = $auditMap[$auditStatus] ?? '未知';
+                    $suffix    = $auditText !== '' ? "（{$auditText}）" : '';
+                    $lines[]   = '审核版本：' . $auditVersion . $suffix;
+                }
+
+                return implode('<br>', $lines);
+            });
             $grid->column('username');
             $grid->column('head_img')->image('', 100, 100);
             $grid->column('account_type')->using(WechatOpenPlatformAuthorizer::$accountTypes);
@@ -90,6 +122,13 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                 $actions->append(new GetAdUnitListAction());
             });
 
+            $grid->batchActions(function (Grid\Tools\BatchActions $batch) {
+                $batch->add(new BatchUpdateVersionInfoAction());
+                $batch->add(new BatchReleaseAction());
+                $batch->add(new BatchRollBackAction());
+                $batch->disableDelete();
+            });
+
             $grid->tools(function (Grid\Tools $tools) {
                 $tools->append(new CreateAuthorizerToolAction());
                 $tools->append(new UpdateAuthorizerRefreshTokenToolAction());
@@ -97,8 +136,6 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
                 $tools->append(new BatchPreCheckAction());
                 $tools->append(new BatchSubmitAuditToolAction());
             });
-
-            $grid->disableBatchActions();
             $grid->showRowSelector();
             $grid->disableCreateButton();
         });
@@ -253,4 +290,5 @@ class WechatOpenPlatformAuthorizerController extends BaseAdminController
 
         return '授权成功';
     }
+
 }
